@@ -6,7 +6,7 @@ const questionSchema = z.object({
   question: z.string().min(1, 'Question is required'),
   answerKey: z.string().min(1, 'Answer key is required'),
   options: z.array(z.string().min(1, 'Option cannot be empty')).length(3, 'Exactly 3 options required'),
-  stream: z.enum(['COMMERCE', 'SCIENCE', 'HUMANITIES']),
+  streamId: z.string().min(1, 'Stream is required'),
   categoryId: z.string().min(1, 'Category is required'),
 })
 
@@ -21,6 +21,7 @@ export async function GET(
       where: { id },
       include: {
         category: true,
+        stream: true,
       },
     })
 
@@ -55,6 +56,7 @@ export async function PUT(
       data: validatedData,
       include: {
         category: true,
+        stream: true,
       },
     })
 

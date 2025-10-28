@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { Plus, Edit, Trash2, Calendar, BookOpen } from 'lucide-react'
+import { Plus, Edit, Trash2, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface Category {
@@ -18,27 +18,30 @@ interface Category {
   name: string
 }
 
+interface Stream {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+}
+
 interface Question {
   id: string
   question: string
   answerKey: string
   options: string[]
-  stream: 'COMMERCE' | 'SCIENCE' | 'HUMANITIES'
+  streamId: string
+  stream: Stream
   categoryId: string
   category: Category
   createdAt: string
   updatedAt: string
 }
 
-const STREAM_OPTIONS = [
-  { value: 'COMMERCE', label: 'Commerce' },
-  { value: 'SCIENCE', label: 'Science' },
-  { value: 'HUMANITIES', label: 'Humanities' },
-]
-
 export default function QuestionariesPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [categories, setCategories] = useState<Category[]>([])
+  const [streams, setStreams] = useState<Stream[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -47,7 +50,7 @@ export default function QuestionariesPage() {
     question: '',
     answerKey: '',
     options: ['', '', ''],
-    stream: '',
+    streamId: '',
     categoryId: ''
   })
 
@@ -61,7 +64,7 @@ export default function QuestionariesPage() {
       } else {
         toast.error('Failed to fetch questions')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error fetching questions')
     } finally {
       setLoading(false)
@@ -75,14 +78,27 @@ export default function QuestionariesPage() {
         const data = await response.json()
         setCategories(data)
       }
-    } catch (error) {
+    } catch {
       toast.error('Error fetching categories')
+    }
+  }
+
+  const fetchStreams = async () => {
+    try {
+      const response = await fetch('/api/streams')
+      if (response.ok) {
+        const data = await response.json()
+        setStreams(data)
+      }
+    } catch {
+      toast.error('Error fetching streams')
     }
   }
 
   useEffect(() => {
     fetchQuestions()
     fetchCategories()
+    fetchStreams()
   }, [])
 
   // Create question
@@ -106,7 +122,7 @@ export default function QuestionariesPage() {
         const error = await response.json()
         toast.error(error.error || 'Failed to create question')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error creating question')
     }
   }
@@ -135,7 +151,7 @@ export default function QuestionariesPage() {
         const error = await response.json()
         toast.error(error.error || 'Failed to update question')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error updating question')
     }
   }
@@ -153,7 +169,7 @@ export default function QuestionariesPage() {
       } else {
         toast.error('Failed to delete question')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error deleting question')
     }
   }
@@ -165,7 +181,7 @@ export default function QuestionariesPage() {
       question: question.question,
       answerKey: question.answerKey,
       options: question.options,
-      stream: question.stream,
+      streamId: question.streamId,
       categoryId: question.categoryId
     })
     setIsEditDialogOpen(true)
@@ -177,7 +193,7 @@ export default function QuestionariesPage() {
       question: '',
       answerKey: '',
       options: ['', '', ''],
-      stream: '',
+      streamId: '',
       categoryId: ''
     })
     setEditingQuestion(null)
@@ -243,14 +259,14 @@ export default function QuestionariesPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="stream">Stream *</Label>
-                    <Select value={formData.stream} onValueChange={(value) => setFormData({ ...formData, stream: value })}>
+                    <Select value={formData.streamId} onValueChange={(value) => setFormData({ ...formData, streamId: value })}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select stream" />
                       </SelectTrigger>
                       <SelectContent>
-                        {STREAM_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
+                        {streams.map((stream) => (
+                          <SelectItem key={stream.id} value={stream.id}>
+                            {stream.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -352,7 +368,7 @@ export default function QuestionariesPage() {
                     </TableCell>
                     <TableCell>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {STREAM_OPTIONS.find(s => s.value === question.stream)?.label}
+                        {question.stream.name}
                       </span>
                     </TableCell>
                     <TableCell>{question.category.name}</TableCell>
@@ -437,14 +453,14 @@ export default function QuestionariesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="edit-stream">Stream *</Label>
-                  <Select value={formData.stream} onValueChange={(value) => setFormData({ ...formData, stream: value })}>
+                  <Select value={formData.streamId} onValueChange={(value) => setFormData({ ...formData, streamId: value })}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select stream" />
                     </SelectTrigger>
                     <SelectContent>
-                      {STREAM_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
+                      {streams.map((stream) => (
+                        <SelectItem key={stream.id} value={stream.id}>
+                          {stream.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
