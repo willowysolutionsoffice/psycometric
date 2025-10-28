@@ -1,45 +1,36 @@
-import { AuthUser } from '@/types/user'
+import { betterAuth } from 'better-auth';
+import { prisma } from '@/lib/prisma';
+import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { nextCookies } from 'better-auth/next-js';
+import { admin } from 'better-auth/plugins/admin';
 
-// Mock auth functions - replace with your actual auth implementation
-export async function getCurrentUser(): Promise<AuthUser | null> {
-  // Mock implementation - replace with your actual auth logic
-  return {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    avatar: undefined,
-    role: 'admin'
-  }
-}
-
-export async function signOut(): Promise<void> {
-  // Mock implementation - replace with your actual sign out logic
-  console.log('Signing out...')
-}
-
-export function useAuth() {
-  // Mock hook - replace with your actual auth hook
-  return {
-    user: null,
-    isLoading: false,
-    signOut: () => signOut()
-  }
-}
-
-// Mock auth object for compatibility
-export const auth = {
-  api: {
-    getSession: async () => {
-      // Mock implementation - replace with your actual auth logic
-      return {
-        user: {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          avatar: undefined,
-          role: 'admin'
-        }
-      }
-    }
-  }
-}
+export const auth = betterAuth({
+  database: prismaAdapter(prisma, {
+    provider: 'mongodb',
+  }),
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: 'string',
+        required: false,
+        defaultValue: 'user',
+        input: true,
+      },
+      branch: {
+        type: 'string',
+        required: false,
+        input: true,
+      },
+    },
+  },
+  plugins: [
+    admin({
+      adminRoles: ['admin'],
+    }),
+    nextCookies(), // This MUST be the last plugin
+  ],
+});

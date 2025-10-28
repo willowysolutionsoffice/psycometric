@@ -4,6 +4,7 @@ import {
   IconDashboard,
   IconQuestionMark,
   IconUser,
+  IconSchool,
 } from "@tabler/icons-react";
 import type { SidebarData } from "@/types/navigation";
 import { APP_CONFIG } from "@/config/app";
@@ -20,6 +21,11 @@ export const SIDEBAR_DATA: SidebarData = {
       title: "Categories",
       url: "/admin/categories",
       icon: IconCategory,
+    },
+    {
+      title: "Streams",
+      url: "/admin/streams",
+      icon: IconSchool,
     },
     {
       title: "Questionaries",

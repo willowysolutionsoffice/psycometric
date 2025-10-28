@@ -1,36 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
-import { categorySchema } from '@/schemas/categoty-schema'
+import { streamSchema } from '@/schemas/stream-schema'
 
-// GET - Fetch a single category by ID
+// GET - Fetch a single stream by ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    const category = await prisma.category.findUnique({
+    const stream = await prisma.stream.findUnique({
       where: { id },
     })
 
-    if (!category) {
+    if (!stream) {
       return NextResponse.json(
-        { error: 'Category not found' },
+        { error: 'Stream not found' },
         { status: 404 }
       )
     }
 
-    return NextResponse.json(category)
+    return NextResponse.json(stream)
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch category' },
+      { error: 'Failed to fetch stream' },
       { status: 500 }
     )
   }
 }
 
-// PUT - Update a category
+// PUT - Update a stream
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -38,37 +38,37 @@ export async function PUT(
   try {
     const { id } = await params
     const body = await request.json()
-    const validatedData = categorySchema.parse(body)
+    const validatedData = streamSchema.parse(body)
 
-    const category = await prisma.category.update({
+    const stream = await prisma.stream.update({
       where: { id },
       data: validatedData,
     })
 
-    return NextResponse.json(category)
+    return NextResponse.json(stream)
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to update category' },
+      { error: 'Failed to update stream' },
       { status: 500 }
     )
   }
 }
 
-// DELETE - Delete a category
+// DELETE - Delete a stream
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    await prisma.category.delete({
+    await prisma.stream.delete({
       where: { id },
     })
 
-    return NextResponse.json({ message: 'Category deleted successfully' })
+    return NextResponse.json({ message: 'Stream deleted successfully' })
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to delete category' },
+      { error: 'Failed to delete stream' },
       { status: 500 }
     )
   }

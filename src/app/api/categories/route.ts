@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { categorySchema } from '@/schemas/categoty-schema'
 
-const categorySchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-})
 
 // GET - Fetch all categories
 export async function GET() {
@@ -33,12 +31,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(category, { status: 201 })
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
-      )
-    }
     return NextResponse.json(
       { error: 'Failed to create category' },
       { status: 500 }
