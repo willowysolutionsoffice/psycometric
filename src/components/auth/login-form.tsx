@@ -44,12 +44,7 @@ const LoginPage = () => {
       if (response.ok) {
         const user = await response.json();
         console.log('Login successful:', user);
-        // Redirect to dashboard or admin panel based on role
-        if (user.role === 'admin') {
-          router.push('/admin/dashboard');
-        } else {
-          router.push('/dashboard');
-        }
+        router.push('/');
       } else {
         const errorData = await response.json();
         setFormError(errorData.error || 'Invalid email or password');

@@ -55,8 +55,7 @@ export async function POST(req: NextRequest) {
       { 
         success: true, 
         message: "Login successful", 
-        user: userWithoutPassword,
-        redirectTo: user.role === 'admin' ? "/admin/dashboard" : "/dashboard"
+        user: userWithoutPassword
       },
       { status: 200 }
     );

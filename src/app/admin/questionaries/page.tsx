@@ -59,9 +59,12 @@ export default function QuestionariesPage() {
   // Fetch questions and categories
   const fetchQuestions = async () => {
     try {
+      console.log('Fetching questions from frontend...')
       const response = await fetch('/api/questions')
+      console.log('Questions response status:', response.status)
       if (response.ok) {
         const data = await response.json()
+        console.log('Fetched questions data:', data)
         setQuestions(data)
       } else {
         toast.error('Failed to fetch questions')
@@ -106,6 +109,7 @@ export default function QuestionariesPage() {
   // Create question
   const handleCreateQuestion = async (e: React.FormEvent) => {
     e.preventDefault()
+    console.log('Submitting question data:', formData)
     try {
       const response = await fetch('/api/questions', {
         method: 'POST',
@@ -115,16 +119,21 @@ export default function QuestionariesPage() {
         body: JSON.stringify(formData),
       })
 
+      console.log('Response status:', response.status)
       if (response.ok) {
+        const result = await response.json()
+        console.log('Question created successfully:', result)
         toast.success('Question created successfully')
         setIsCreateDialogOpen(false)
         resetForm()
         fetchQuestions()
       } else {
         const error = await response.json()
+        console.error('Error response:', error)
         toast.error(error.error || 'Failed to create question')
       }
-    } catch {
+    } catch (error) {
+      console.error('Network error:', error)
       toast.error('Error creating question')
     }
   }
@@ -547,9 +556,9 @@ export default function QuestionariesPage() {
                 <div>
                   <Label className="text-sm font-medium text-gray-500">Stream</Label>
                   <div className="mt-1">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      {STREAM_OPTIONS.find(s => s.value === viewingQuestion.stream)?.label}
-                    </span>
+                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                       {viewingQuestion.stream.name}
+                     </span>
                   </div>
                 </div>
                 
