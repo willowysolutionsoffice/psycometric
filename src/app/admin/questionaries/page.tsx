@@ -45,7 +45,9 @@ export default function QuestionariesPage() {
   const [loading, setLoading] = useState(true)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false)
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
+  const [viewingQuestion, setViewingQuestion] = useState<Question | null>(null)
   const [formData, setFormData] = useState({
     question: '',
     answerKey: '',
@@ -185,6 +187,12 @@ export default function QuestionariesPage() {
       categoryId: question.categoryId
     })
     setIsEditDialogOpen(true)
+  }
+
+  // Open detail dialog
+  const openDetailDialog = (question: Question) => {
+    setViewingQuestion(question)
+    setIsDetailDialogOpen(true)
   }
 
   // Reset form
@@ -360,7 +368,7 @@ export default function QuestionariesPage() {
               </TableHeader>
               <TableBody>
                 {questions.map((question) => (
-                  <TableRow key={question.id}>
+                  <TableRow key={question.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openDetailDialog(question)}>
                     <TableCell className="max-w-xs">
                       <div className="truncate" title={question.question}>
                         {question.question}
@@ -385,7 +393,7 @@ export default function QuestionariesPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -516,6 +524,95 @@ export default function QuestionariesPage() {
               <Button type="submit">Update Question</Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Detail Dialog */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Question Details</DialogTitle>
+            <DialogDescription>
+              View complete question information
+            </DialogDescription>
+          </DialogHeader>
+          {viewingQuestion && (
+            <div className="space-y-6">
+              <div>
+                <Label className="text-sm font-medium text-gray-500">Question</Label>
+                <p className="mt-1 text-base">{viewingQuestion.question}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Stream</Label>
+                  <div className="mt-1">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {STREAM_OPTIONS.find(s => s.value === viewingQuestion.stream)?.label}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Category</Label>
+                  <p className="mt-1 text-base">{viewingQuestion.category.name}</p>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-500">Answer Key</Label>
+                <p className="mt-1 text-base font-medium text-green-600">{viewingQuestion.answerKey}</p>
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium text-gray-500">Options</Label>
+                <div className="mt-2 space-y-2">
+                  {viewingQuestion.options.map((option, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <span className="flex-shrink-0 w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span className="flex-1">{option}</span>
+                      {option === viewingQuestion.answerKey && (
+                        <span className="flex-shrink-0 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                          Correct Answer
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Created At</Label>
+                  <p className="mt-1 text-sm text-gray-600">
+                    {new Date(viewingQuestion.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-500">Updated At</Label>
+                  <p className="mt-1 text-sm text-gray-600">
+                    {new Date(viewingQuestion.updatedAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDetailDialogOpen(false)}>
+              Close
+            </Button>
+            {viewingQuestion && (
+              <Button onClick={() => {
+                setIsDetailDialogOpen(false)
+                openEditDialog(viewingQuestion)
+              }}>
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Question
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
