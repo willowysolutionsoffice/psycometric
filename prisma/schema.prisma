@@ -12,6 +12,27 @@ model Category {
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  questions Question[]
 
   @@map("categories")
+}
+
+model Question {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  question    String
+  answerKey   String
+  options     String[] // Array of options
+  stream      Stream
+  categoryId  String   @db.ObjectId
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("questions")
+}
+
+enum Stream {
+  COMMERCE
+  SCIENCE
+  HUMANITIES
 }
