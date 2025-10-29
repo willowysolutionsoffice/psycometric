@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, User, Info } from 'lucide-react';
+import { CheckCircle, XCircle, User} from 'lucide-react';
 
 // Hardcoded questions and answers
 const questions = [
@@ -252,23 +252,25 @@ export default function TestQuestions() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [completedQuestions, setCompletedQuestions] = useState(0);
-  const [timer, setTimer] = useState(0);
+ // Timer setup: start from 15 minutes (900 seconds)
+  const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
 
-  // Timer effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => prev + 1);
-    }, 1000);
+// Countdown effect
+useEffect(() => {
+  if (timer <= 0) return; // stop when timer reaches 0
+  const interval = setInterval(() => {
+    setTimer((prev) => prev - 1);
+  }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+  return () => clearInterval(interval);
+}, [timer]);
 
-  // Format timer (MM:SS)
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+// Format timer (MM:SS)
+const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
 
   const handleAnswerSelect = (answerId: string) => {
     if (!isSubmitted) {
@@ -302,10 +304,6 @@ export default function TestQuestions() {
 
           {/* Right side icons */}
           <div className="flex items-center gap-4">
-            {/* Info Icon */}
-            <button className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center hover:bg-cyan-600 transition-colors">
-              <Info className="w-5 h-5 text-white" />
-            </button>
 
             {/* Progress Circle */}
             <div className="relative w-14 h-14">
