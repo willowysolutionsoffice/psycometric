@@ -106,7 +106,7 @@ const SignUpPage = () => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="min-h-screen flex flex-col lg:flex-row overflow-hidden">
       {/* Left Panel - Image Carousel (60% width on desktop, hidden on mobile) */}
       <div className="hidden lg:block lg:w-3/5 relative">
         <ImageCarousel images={carouselImages} autoChangeInterval={4000} />
@@ -125,36 +125,36 @@ const SignUpPage = () => {
       </div>
 
       {/* Right Panel - Sign Up Form (40% width on desktop, full width on mobile) */}
-          <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-8 bg-white grow">
+      <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-white overflow-y-auto">
         <div className="max-w-md mx-auto w-full">
           {/* Branding Section */}
-          <div className="mb-6 sm:mb-8 lg:mb-10 text-center flex flex-col items-center justify-center">
+          <div className="mb-4 sm:mb-6 text-center flex flex-col items-center justify-center">
             {/* Logo */}
             <Image
               src="/images/psycologo.png"
               alt="Psycho Logo"
-              width={120}
-              height={120}
-              className="rounded-full bg-white/20 backdrop-blur-sm p-2 mb-3 sm:mb-4 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32"
+              width={80}
+              height={80}
+              className="rounded-full bg-white/20 backdrop-blur-sm p-2 mb-2 w-16 h-16 sm:w-20 sm:h-20"
               priority
             />
             
             {/* Get Started Heading */}
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
               Get Started
             </h2>
             
             {/* Sign-up specific content */}
-            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
               Create Your Account
             </h3>
-            <p className="text-text-subtle text-sm sm:text-base">
+            <p className="text-text-subtle text-xs sm:text-sm">
               Join our platform and start your psychological assessment journey.
             </p>
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(submit)} className="space-y-4 sm:space-y-6">
+            <form onSubmit={form.handleSubmit(submit)} className="space-y-3 sm:space-y-4">
               {formError && (
                 <p className="text-red-500 text-sm text-center">{formError}</p>
               )}
@@ -173,7 +173,7 @@ const SignUpPage = () => {
                           placeholder="Enter your full name"
                           autoComplete="name"
                           disabled={isSubmitting}
-                          className="pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base"
+                          className="pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                           {...field}
                         />
                       </div>
@@ -198,7 +198,7 @@ const SignUpPage = () => {
                           type="email"
                           autoComplete="email"
                           disabled={isSubmitting}
-                          className="pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base"
+                          className="pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                           {...field}
                         />
                       </div>
@@ -223,7 +223,7 @@ const SignUpPage = () => {
                           type="tel"
                           autoComplete="tel"
                           disabled={isSubmitting}
-                          className="pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base"
+                          className="pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                           {...field}
                         />
                       </div>
@@ -243,7 +243,7 @@ const SignUpPage = () => {
                       <div className="relative">
                         <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-subtle w-4 h-4 z-10" />
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger className="w-full pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base">
+                          <SelectTrigger className="w-full pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                             <SelectValue placeholder="Select your stream" />
                           </SelectTrigger>
                               <SelectContent>
@@ -276,7 +276,7 @@ const SignUpPage = () => {
                           type="password"
                           autoComplete="new-password"
                           disabled={isSubmitting}
-                          className="pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base"
+                          className="pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                           {...field}
                         />
                       </div>
@@ -301,7 +301,7 @@ const SignUpPage = () => {
                           type="password"
                           autoComplete="new-password"
                           disabled={isSubmitting}
-                          className="pl-10 py-2 sm:py-3 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm sm:text-base"
+                          className="pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm"
                           {...field}
                         />
                       </div>
@@ -326,7 +326,7 @@ const SignUpPage = () => {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 sm:py-3 bg-primary hover:bg-primary-glow text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base"
+                className="w-full py-2 bg-primary hover:bg-primary-glow text-primary-foreground rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200 text-sm"
               >
                 {isSubmitting ? "Creating Account..." : "Create Account"}
                 <ArrowRight className="w-4 h-4" />
@@ -334,7 +334,7 @@ const SignUpPage = () => {
             </form>
           </Form>
 
-          <div className="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
+          <div className="mt-3 text-center text-xs">
             <span className="text-text-subtle">
               Already have an account?{" "}
               <Link href="/login" className="text-primary hover:underline font-medium">
