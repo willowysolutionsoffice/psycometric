@@ -83,8 +83,28 @@ export default function TestQuestions() {
         }
         const data: Question[] = await response.json();
         
+        // Remove duplicates based on question ID (most reliable)
+        const uniqueQuestionsById = new Map<string, Question>();
+        data.forEach(question => {
+          if (!uniqueQuestionsById.has(question.id)) {
+            uniqueQuestionsById.set(question.id, question);
+          }
+        });
+        
+        // Also remove duplicates based on question text (in case same question exists with different IDs)
+        const uniqueQuestionsByText = new Map<string, Question>();
+        uniqueQuestionsById.forEach(question => {
+          const normalizedText = question.question.trim().toLowerCase();
+          if (!uniqueQuestionsByText.has(normalizedText)) {
+            uniqueQuestionsByText.set(normalizedText, question);
+          }
+        });
+        
+        // Convert map back to array
+        const uniqueQuestions = Array.from(uniqueQuestionsByText.values());
+        
         // Transform questions
-        const transformedQuestions = data.map(transformQuestion);
+        const transformedQuestions = uniqueQuestions.map(transformQuestion);
         
         // Shuffle the questions array
         const shuffledQuestions = shuffleArray(transformedQuestions);
