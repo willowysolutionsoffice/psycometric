@@ -5,6 +5,7 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -22,7 +23,8 @@ import { Question } from "@/types/question";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface QuestionTableProps<TValue> {
   columns: ColumnDef<Question, TValue>[];
@@ -41,6 +43,12 @@ export function QuestionTable<TValue>({ columns, data }: QuestionTableProps<TVal
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
     globalFilterFn: (row, columnId, filterValue) => {
       const question = row.getValue('question') as string;
       const category = (row.original as Question).category.name;
@@ -129,6 +137,44 @@ export function QuestionTable<TValue>({ columns, data }: QuestionTableProps<TVal
               )}
             </TableBody>
           </Table>
+          
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between px-2 py-4">
+            <div className="text-sm text-muted-foreground">
+              Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
+              {Math.min(
+                (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
+                table.getFilteredRowModel().rows.length
+              )}{" "}
+              of {table.getFilteredRowModel().rows.length} questions
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Previous
+              </Button>
+              <div className="flex items-center gap-1">
+                <span className="text-sm text-muted-foreground">
+                  Page {table.getState().pagination.pageIndex + 1} of{" "}
+                  {table.getPageCount()}
+                </span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
