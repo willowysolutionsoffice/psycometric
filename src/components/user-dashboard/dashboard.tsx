@@ -1,7 +1,11 @@
+"use client"
 import React from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // ✅ added import
 
 export default function PsychometricDashboard() {
+  const router = useRouter(); // ✅ initialize router
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
@@ -41,7 +45,10 @@ export default function PsychometricDashboard() {
         
         {/* Get Started Button */}
         <div className="flex justify-center mt-8">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-12 py-4 rounded-lg shadow-lg transition-colors duration-200 text-lg">
+          <button
+            onClick={() => router.push('/test-questions')} // ✅ navigate to test-questions
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-12 py-4 rounded-lg shadow-lg transition-colors duration-200 text-lg"
+          >
             Get Started
           </button>
         </div>
