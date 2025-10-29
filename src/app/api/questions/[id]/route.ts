@@ -2,13 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
-const questionSchema = z.object({
-  question: z.string().min(1, 'Question is required'),
-  answerKey: z.string().min(1, 'Answer key is required'),
-  options: z.array(z.string().min(1, 'Option cannot be empty')).length(3, 'Exactly 3 options required'),
-  streamId: z.string().min(1, 'Stream is required'),
-  categoryId: z.string().min(1, 'Category is required'),
-})
+import { questionSchema } from '@/schemas/question-schema'
 
 // GET - Fetch a single question by ID
 export async function GET(

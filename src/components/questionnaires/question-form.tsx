@@ -50,10 +50,25 @@ export const QuestionFormDialog = ({ question, open, openChange }: QuestionFormP
       question: question?.question || "",
       answerKey: question?.answerKey || "",
       options: question?.options || ["", "", ""],
+      personalityType: question?.personalityType || "",
       streamId: question?.streamId || "",
       categoryId: question?.categoryId || "",
     },
   });
+
+  // Reset form when question prop changes
+  useEffect(() => {
+    if (question) {
+      form.reset({
+        question: question.question || "",
+        answerKey: question.answerKey || "",
+        options: question.options || ["", "", ""],
+        personalityType: question.personalityType || "",
+        streamId: question.streamId || "",
+        categoryId: question.categoryId || "",
+      });
+    }
+  }, [question, form]);
 
   // Fetch categories and streams
   useEffect(() => {
@@ -207,6 +222,32 @@ export const QuestionFormDialog = ({ question, open, openChange }: QuestionFormP
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="personalityType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Personality Type</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select personality type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Realistic">Realistic</SelectItem>
+                      <SelectItem value="Investigative">Investigative</SelectItem>
+                      <SelectItem value="Artistic">Artistic</SelectItem>
+                      <SelectItem value="Social">Social</SelectItem>
+                      <SelectItem value="Enterprising">Enterprising</SelectItem>
+                      <SelectItem value="Conventional">Conventional</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="space-y-2">
               <FormLabel>Wrong Answer Options</FormLabel>

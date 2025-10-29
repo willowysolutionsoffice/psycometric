@@ -17,6 +17,7 @@ export interface Question {
   question: string
   answerKey: string
   options: string[]
+  personalityType?: string | null
   streamId: string
   stream: Stream
   categoryId: string

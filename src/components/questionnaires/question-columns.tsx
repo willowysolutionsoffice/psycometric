@@ -70,8 +70,17 @@ export const questionColumns: ColumnDef<Question>[] = [
     ),
   },
   {
+    accessorKey: "personalityType",
+    header: "Personality Type",
+    cell: ({ row }) => (
+      <div className="px-3">
+        {(row.original as Question).personalityType || "-"}
+      </div>
+    ),
+  },
+  {
     id: "actions",
-    header: "Actions",
+    header: () => <div className="text-right px-3">Actions</div>,
     cell: ({ row }) =>
       row.original && <QuestionActions question={row.original} />,
   },
@@ -83,7 +92,7 @@ const QuestionActions = ({ question }: { question: Question }) => {
 
   return (
     <>
-      <div className="flex justify-start items-center gap-2">
+      <div className="flex justify-end items-center gap-2">
         {/* Edit Button */}
         <Button
           variant="outline"
