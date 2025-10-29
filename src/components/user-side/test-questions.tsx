@@ -2,252 +2,70 @@
 
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, User} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Question } from '@/types/question';
 
-// Hardcoded questions and answers
-const questions = [
-  {
-    id: 1,
-    question: "The study of forces and the resulting motion of objects through the air?",
-    options: [
-      { id: 'A', text: 'Aeronautics' },
-      { id: 'B', text: 'Astrophysics' },
-      { id: 'C', text: 'Aerodynamics' },
-      { id: 'D', text: 'Astrology' }
-    ],
-    correctAnswer: 'C',
-    explanation: "Aerodynamics is the study of how air moves around things. So, anything that moves in the air reacts to dynamics therefore it studies the effects of the motion of a large airliner, a model rocket, a beach ball thrown near the shore, or a kite flying high overhead."
-  },
-  {
-    id: 2,
-    question: "What is the largest planet in our solar system?",
-    options: [
-      { id: 'A', text: 'Earth' },
-      { id: 'B', text: 'Jupiter' },
-      { id: 'C', text: 'Saturn' },
-      { id: 'D', text: 'Mars' }
-    ],
-    correctAnswer: 'B',
-    explanation: "Jupiter is the largest planet in our solar system, with a diameter of about 143,000 kilometers."
-  },
-  {
-    id: 3,
-    question: "Which programming language is known for web development?",
-    options: [
-      { id: 'A', text: 'Python' },
-      { id: 'B', text: 'JavaScript' },
-      { id: 'C', text: 'C++' },
-      { id: 'D', text: 'Swift' }
-    ],
-    correctAnswer: 'B',
-    explanation: "JavaScript is primarily known for web development and runs in web browsers to create interactive websites."
-  },
-  {
-    id: 4,
-    question: "What is the chemical symbol for gold?",
-    options: [
-      { id: 'A', text: 'Go' },
-      { id: 'B', text: 'Gd' },
-      { id: 'C', text: 'Au' },
-      { id: 'D', text: 'Ag' }
-    ],
-    correctAnswer: 'C',
-    explanation: "Au comes from the Latin word 'aurum' meaning gold."
-  },
-  {
-    id: 5,
-    question: "Who painted the Mona Lisa?",
-    options: [
-      { id: 'A', text: 'Vincent van Gogh' },
-      { id: 'B', text: 'Pablo Picasso' },
-      { id: 'C', text: 'Leonardo da Vinci' },
-      { id: 'D', text: 'Michelangelo' }
-    ],
-    correctAnswer: 'C',
-    explanation: "Leonardo da Vinci painted the Mona Lisa in the early 16th century."
-  },
-  {
-    id: 6,
-    question: "What is the speed of light in vacuum?",
-    options: [
-      { id: 'A', text: '300,000 km/s' },
-      { id: 'B', text: '150,000 km/s' },
-      { id: 'C', text: '450,000 km/s' },
-      { id: 'D', text: '200,000 km/s' }
-    ],
-    correctAnswer: 'A',
-    explanation: "The speed of light in vacuum is approximately 300,000 kilometers per second."
-  },
-  {
-    id: 7,
-    question: "Which organ pumps blood through the body?",
-    options: [
-      { id: 'A', text: 'Lungs' },
-      { id: 'B', text: 'Brain' },
-      { id: 'C', text: 'Heart' },
-      { id: 'D', text: 'Liver' }
-    ],
-    correctAnswer: 'C',
-    explanation: "The heart is a muscular organ that pumps blood throughout the body."
-  },
-  {
-    id: 8,
-    question: "What is the capital of France?",
-    options: [
-      { id: 'A', text: 'London' },
-      { id: 'B', text: 'Berlin' },
-      { id: 'C', text: 'Paris' },
-      { id: 'D', text: 'Madrid' }
-    ],
-    correctAnswer: 'C',
-    explanation: "Paris is the capital and largest city of France."
-  },
-  {
-    id: 9,
-    question: "Which element has the atomic number 1?",
-    options: [
-      { id: 'A', text: 'Helium' },
-      { id: 'B', text: 'Hydrogen' },
-      { id: 'C', text: 'Oxygen' },
-      { id: 'D', text: 'Carbon' }
-    ],
-    correctAnswer: 'B',
-    explanation: "Hydrogen is the lightest element with atomic number 1."
-  },
-  {
-    id: 10,
-    question: "What year did World War II end?",
-    options: [
-      { id: 'A', text: '1943' },
-      { id: 'B', text: '1944' },
-      { id: 'C', text: '1945' },
-      { id: 'D', text: '1946' }
-    ],
-    correctAnswer: 'C',
-    explanation: "World War II ended in 1945 with the surrender of Germany and Japan."
-  },
-  {
-    id: 11,
-    question: "What is the smallest unit of life?",
-    options: [
-      { id: 'A', text: 'Atom' },
-      { id: 'B', text: 'Cell' },
-      { id: 'C', text: 'Molecule' },
-      { id: 'D', text: 'Organ' }
-    ],
-    correctAnswer: 'B',
-    explanation: "The cell is the smallest unit of life that can function independently."
-  },
-  {
-    id: 12,
-    question: "Which planet is known as the Red Planet?",
-    options: [
-      { id: 'A', text: 'Venus' },
-      { id: 'B', text: 'Mars' },
-      { id: 'C', text: 'Jupiter' },
-      { id: 'D', text: 'Saturn' }
-    ],
-    correctAnswer: 'B',
-    explanation: "Mars is known as the Red Planet due to its reddish appearance caused by iron oxide on its surface."
-  },
-  {
-    id: 13,
-    question: "What is the boiling point of water at sea level?",
-    options: [
-      { id: 'A', text: '90°C' },
-      { id: 'B', text: '100°C' },
-      { id: 'C', text: '110°C' },
-      { id: 'D', text: '120°C' }
-    ],
-    correctAnswer: 'B',
-    explanation: "Water boils at 100°C (212°F) at sea level under normal atmospheric pressure."
-  },
-  {
-    id: 14,
-    question: "Who wrote 'Romeo and Juliet'?",
-    options: [
-      { id: 'A', text: 'Charles Dickens' },
-      { id: 'B', text: 'William Shakespeare' },
-      { id: 'C', text: 'Jane Austen' },
-      { id: 'D', text: 'Mark Twain' }
-    ],
-    correctAnswer: 'B',
-    explanation: "William Shakespeare wrote the tragic play 'Romeo and Juliet' in the 1590s."
-  },
-  {
-    id: 15,
-    question: "What is the largest ocean on Earth?",
-    options: [
-      { id: 'A', text: 'Atlantic Ocean' },
-      { id: 'B', text: 'Indian Ocean' },
-      { id: 'C', text: 'Pacific Ocean' },
-      { id: 'D', text: 'Arctic Ocean' }
-    ],
-    correctAnswer: 'C',
-    explanation: "The Pacific Ocean is the largest ocean, covering about 46% of Earth's water surface."
-  },
-  {
-    id: 16,
-    question: "What is the square root of 144?",
-    options: [
-      { id: 'A', text: '10' },
-      { id: 'B', text: '11' },
-      { id: 'C', text: '12' },
-      { id: 'D', text: '13' }
-    ],
-    correctAnswer: 'C',
-    explanation: "12 × 12 = 144, so the square root of 144 is 12."
-  },
-  {
-    id: 17,
-    question: "Which gas do plants absorb from the atmosphere?",
-    options: [
-      { id: 'A', text: 'Oxygen' },
-      { id: 'B', text: 'Carbon Dioxide' },
-      { id: 'C', text: 'Nitrogen' },
-      { id: 'D', text: 'Hydrogen' }
-    ],
-    correctAnswer: 'B',
-    explanation: "Plants absorb carbon dioxide during photosynthesis and release oxygen."
-  },
-  {
-    id: 18,
-    question: "What is the currency of Japan?",
-    options: [
-      { id: 'A', text: 'Yuan' },
-      { id: 'B', text: 'Won' },
-      { id: 'C', text: 'Yen' },
-      { id: 'D', text: 'Rupee' }
-    ],
-    correctAnswer: 'C',
-    explanation: "The yen is the official currency of Japan."
-  },
-  {
-    id: 19,
-    question: "How many continents are there?",
-    options: [
-      { id: 'A', text: '5' },
-      { id: 'B', text: '6' },
-      { id: 'C', text: '7' },
-      { id: 'D', text: '8' }
-    ],
-    correctAnswer: 'C',
-    explanation: "There are 7 continents: Africa, Antarctica, Asia, Europe, North America, Oceania, and South America."
-  },
-  {
-    id: 20,
-    question: "What is the hardest natural substance on Earth?",
-    options: [
-      { id: 'A', text: 'Gold' },
-      { id: 'B', text: 'Iron' },
-      { id: 'C', text: 'Diamond' },
-      { id: 'D', text: 'Platinum' }
-    ],
-    correctAnswer: 'C',
-    explanation: "Diamond is the hardest naturally occurring substance on Earth."
+// Shuffle array function using Fisher-Yates algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-];
+  return shuffled;
+}
+
+// Transform database question to display format with shuffled options
+interface DisplayQuestion {
+  id: string;
+  question: string;
+  options: { id: string; text: string }[];
+  correctAnswer: string;
+  explanation?: string;
+}
+
+function transformQuestion(dbQuestion: Question): DisplayQuestion {
+  // Remove answerKey from options if it exists there (to avoid duplicates)
+  // Then combine wrong answers with correct answer
+  const wrongOptions = dbQuestion.options.filter(opt => opt !== dbQuestion.answerKey);
+  
+  // Combine wrong options with correct answer
+  const allOptions = [...wrongOptions, dbQuestion.answerKey];
+  
+  // Ensure we have exactly 4 options
+  // If we have more than 4, take only the first 4
+  // If we have fewer than 4 (shouldn't happen with proper data), use what we have
+  const finalOptions = allOptions.slice(0, 4);
+  
+  // Create options array with labels (A, B, C, D)
+  const optionLabels = ['A', 'B', 'C', 'D'];
+  const correctAnswerText = dbQuestion.answerKey;
+  
+  const optionsWithLabels = finalOptions.map((text, index) => ({
+    id: optionLabels[index],
+    text: text
+  }));
+
+  // Shuffle the options
+  const shuffledOptions = shuffleArray(optionsWithLabels);
+
+  // Find the new position of the correct answer after shuffling
+  const newCorrectAnswer = shuffledOptions.find(
+    opt => opt.text === correctAnswerText
+  )?.id || 'A';
+
+  return {
+    id: dbQuestion.id,
+    question: dbQuestion.question,
+    options: shuffledOptions,
+    correctAnswer: newCorrectAnswer,
+  };
+}
 
 export default function TestQuestions() {
+  const router = useRouter();
+  const [questions, setQuestions] = useState<DisplayQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -255,15 +73,45 @@ export default function TestQuestions() {
  // Timer setup: start from 15 minutes (900 seconds)
   const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
 
+  // Fetch questions from database
+  useEffect(() => {
+    async function fetchQuestions() {
+      try {
+        const response = await fetch('/api/questions');
+        if (!response.ok) {
+          throw new Error('Failed to fetch questions');
+        }
+        const data: Question[] = await response.json();
+        
+        // Transform questions
+        const transformedQuestions = data.map(transformQuestion);
+        
+        // Shuffle the questions array
+        const shuffledQuestions = shuffleArray(transformedQuestions);
+        
+        // Limit to only 20 questions
+        const limitedQuestions = shuffledQuestions.slice(0, 20);
+        
+        setQuestions(limitedQuestions);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+        setLoading(false);
+      }
+    }
+
+    fetchQuestions();
+  }, []);
+
 // Countdown effect
 useEffect(() => {
-  if (timer <= 0) return; // stop when timer reaches 0
+    if (timer <= 0 || loading || questions.length === 0) return; // stop when timer reaches 0 or no questions
   const interval = setInterval(() => {
     setTimer((prev) => prev - 1);
   }, 1000);
 
   return () => clearInterval(interval);
-}, [timer]);
+  }, [timer, loading, questions.length]);
 
 // Format timer (MM:SS)
 const formatTime = (seconds: number) => {
@@ -284,13 +132,45 @@ const formatTime = (seconds: number) => {
   };
 
   const handleNext = () => {
+    // If this is the last question (question 20), redirect to interest result page
+    if (currentQuestion >= 19) {
+      router.push('/interest-result');
+      return;
+    }
+    
+    // Move to next question
     setCurrentQuestion(currentQuestion + 1);
     setSelectedAnswer(null);
     setIsSubmitted(false);
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-orange-600 font-semibold">Loading questions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No questions state
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-orange-600 font-semibold text-xl">No questions available</p>
+          <p className="text-gray-600 mt-2">Please check back later.</p>
+        </div>
+      </div>
+    );
+  }
+
   const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
-  const progressPercentage = (completedQuestions / 20) * 100;
+  const totalQuestions = 20; // Fixed limit of 20 questions
+  const progressPercentage = (completedQuestions / totalQuestions) * 100;
 
   return (
     <div className="min-h-screen bg-orange-50">
@@ -396,7 +276,7 @@ const formatTime = (seconds: number) => {
 
             {/* Options */}
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              {questions[currentQuestion].options.map((option) => {
+              {questions[currentQuestion].options.map((option, index) => {
                 const isSelected = selectedAnswer === option.id;
                 const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
                 
@@ -421,7 +301,7 @@ const formatTime = (seconds: number) => {
 
                 return (
                   <button
-                    key={option.id}
+                    key={`${questions[currentQuestion].id}-${option.id}-${index}`}
                     onClick={() => handleAnswerSelect(option.id)}
                     disabled={isSubmitted}
                     className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
@@ -454,11 +334,13 @@ const formatTime = (seconds: number) => {
                 <h3 className={`text-xl font-bold mb-3 ${
                   isCorrect ? 'text-cyan-600' : 'text-orange-600'
                 }`}>
-                  {isCorrect ? 'Correct!' : 'Oh no!'}
+                  {isCorrect ? 'Correct!' : 'Incorrect!'}
                 </h3>
+                {questions[currentQuestion].explanation && (
                 <p className="text-gray-700 leading-relaxed">
                   &quot;{questions[currentQuestion].explanation}&quot;
                 </p>
+                )}
               </div>
             )}
 
@@ -475,10 +357,9 @@ const formatTime = (seconds: number) => {
               ) : (
                 <button
                   onClick={handleNext}
-                  disabled={currentQuestion >= 19}
-                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all"
                 >
-                  {currentQuestion >= 19 ? 'Completed' : 'Next'}
+                  {currentQuestion >= 19 ? 'View Results' : 'Next'}
                 </button>
               )}
             </div>
