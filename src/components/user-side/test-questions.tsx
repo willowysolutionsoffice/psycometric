@@ -1,6 +1,7 @@
 "use client"
-import React, { useState } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { CheckCircle, XCircle, User} from 'lucide-react';
 
 // Hardcoded questions and answers
 const questions = [
@@ -250,6 +251,26 @@ export default function TestQuestions() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [completedQuestions, setCompletedQuestions] = useState(0);
+ // Timer setup: start from 15 minutes (900 seconds)
+  const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
+
+// Countdown effect
+useEffect(() => {
+  if (timer <= 0) return; // stop when timer reaches 0
+  const interval = setInterval(() => {
+    setTimer((prev) => prev - 1);
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [timer]);
+
+// Format timer (MM:SS)
+const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
 
   const handleAnswerSelect = (answerId: string) => {
     if (!isSubmitted) {
@@ -259,6 +280,7 @@ export default function TestQuestions() {
 
   const handleSubmit = () => {
     setIsSubmitted(true);
+    setCompletedQuestions(completedQuestions + 1);
   };
 
   const handleNext = () => {
@@ -268,139 +290,198 @@ export default function TestQuestions() {
   };
 
   const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
+  const progressPercentage = (completedQuestions / 20) * 100;
 
   return (
-    <div className="min-h-screen bg-orange-50 p-4 md:p-8 flex flex-col items-center justify-center">
-      <div className="w-full mb-12">
-        {/* Orange Header with Airplanes */}
-        <div className="relative bg-orange-500 rounded-t-3xl p-8 overflow-hidden">
-          {/* Decorative circles and airplanes */}
-          <div className="absolute top-4 left-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
-          <div className="absolute top-4 right-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
-          
-          {/* Airplane icons */}
-          <div className="absolute top-12 left-32">
-            <svg className="w-12 h-12 text-orange-400 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-            </svg>
-          </div>
-          <div className="absolute top-8 left-1/2">
-            <svg className="w-10 h-10 text-orange-400 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-            </svg>
-          </div>
-          <div className="absolute top-16 right-32">
-            <svg className="w-12 h-12 text-orange-400 transform rotate-45" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-            </svg>
-          </div>
+    <div className="min-h-screen bg-orange-50">
+      {/* Top Header Bar */}
+      <div className="bg-orange-50 px-4 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          {/* Title */}
+          <h2 className="text-lg md:text-xl font-semibold text-orange-600">
+            Aerospace Engineering
+          </h2>
 
-          {/* Question Counter */}
-          <div className="relative text-center">
-            <div className="inline-block bg-white px-6 py-2 rounded-full shadow-md">
-              <span className="text-orange-500 font-semibold">
-                Question {currentQuestion + 1}/20
-              </span>
+          {/* Right side icons */}
+          <div className="flex items-center gap-4">
+
+            {/* Progress Circle */}
+            <div className="relative w-14 h-14">
+              {/* Background circle */}
+              <svg className="w-14 h-14 transform -rotate-90">
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  stroke="#e5e7eb"
+                  strokeWidth="4"
+                  fill="white"
+                />
+                {/* Progress circle */}
+                <circle
+                  cx="28"
+                  cy="28"
+                  r="24"
+                  stroke="#fb923c"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 24}`}
+                  strokeDashoffset={`${2 * Math.PI * 24 * (1 - progressPercentage / 100)}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+              </svg>
+              {/* User Icon in center */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <User className="w-6 h-6 text-orange-500" />
+              </div>
+              {/* Notification badge */}
+              {completedQuestions > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-bold">{completedQuestions}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
+      </div>
 
-        {/* White Content Area */}
-        <div className="bg-white rounded-b-3xl shadow-xl p-8 md:p-12">
-          {/* Question */}
-          <div className="mb-12">
-            <p className="text-xl md:text-2xl text-gray-800 text-center font-medium">
-              {questions[currentQuestion].question}
-            </p>
+      {/* Main Content */}
+      <div className="px-4 pb-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Orange Header with Airplanes */}
+          <div className="relative bg-orange-500 rounded-t-3xl p-8 overflow-hidden">
+            {/* Decorative circles and airplanes */}
+            <div className="absolute top-4 left-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
+            <div className="absolute top-4 right-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
+            
+            {/* Airplane icons */}
+            <div className="absolute top-12 left-32">
+              <svg className="w-12 h-12 text-orange-400 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+              </svg>
+            </div>
+            <div className="absolute top-8 left-1/2">
+              <svg className="w-10 h-10 text-orange-400 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+              </svg>
+            </div>
+            <div className="absolute top-16 right-32">
+              <svg className="w-12 h-12 text-orange-400 transform rotate-45" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+              </svg>
+            </div>
+
+            {/* Question Counter and Timer */}
+            <div className="relative text-center space-y-3">
+              <div className="inline-block bg-white px-6 py-2 rounded-full shadow-md">
+                <span className="text-orange-500 font-semibold">
+                  Question {currentQuestion + 1}/20
+                </span>
+              </div>
+              <div className="text-white text-sm font-medium">
+                Time: {formatTime(timer)}
+              </div>
+            </div>
           </div>
 
-          {/* Options */}
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
-            {questions[currentQuestion].options.map((option) => {
-              const isSelected = selectedAnswer === option.id;
-              const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
-              
-              let borderColor = 'border-gray-300';
-              let bgColor = 'bg-white';
-              let textColor = 'text-gray-800';
-              
-              if (isSubmitted) {
-                if (isSelected && !isCorrect) {
-                  borderColor = 'border-orange-500';
-                  bgColor = 'bg-orange-50';
-                  textColor = 'text-orange-600';
-                } else if (isCorrectAnswer) {
-                  borderColor = 'border-cyan-500';
-                  bgColor = 'bg-cyan-50';
-                  textColor = 'text-cyan-600';
-                }
-              } else if (isSelected) {
-                borderColor = 'border-gray-400';
-                bgColor = 'bg-gray-50';
-              }
-
-              return (
-                <button
-                  key={option.id}
-                  onClick={() => handleAnswerSelect(option.id)}
-                  disabled={isSubmitted}
-                  className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
-                >
-                  <span className="font-medium">
-                    {option.id}. {option.text}
-                  </span>
-                  {isSubmitted && (
-                    <>
-                      {isSelected && !isCorrect && (
-                        <XCircle className="w-6 h-6 text-orange-500" />
-                      )}
-                      {isCorrectAnswer && (
-                        <CheckCircle className="w-6 h-6 text-cyan-500" />
-                      )}
-                    </>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Feedback Message */}
-          {isSubmitted && (
-            <div className={`mb-8 p-6 rounded-lg border-2 ${
-              isCorrect 
-                ? 'bg-cyan-50 border-cyan-200' 
-                : 'bg-orange-50 border-orange-200'
-            }`}>
-              <h3 className={`text-xl font-bold mb-3 ${
-                isCorrect ? 'text-cyan-600' : 'text-orange-600'
-              }`}>
-                {isCorrect ? 'Correct!' : 'Oh no!'}
-              </h3>
-              <p className="text-gray-700 leading-relaxed">
-                &quot;{questions[currentQuestion].explanation}&quot;
+          {/* White Content Area */}
+          <div className="bg-white rounded-b-3xl shadow-xl p-8 md:p-12">
+            {/* Question */}
+            <div className="mb-12">
+              <p className="text-xl md:text-2xl text-gray-800 text-center font-medium">
+                {questions[currentQuestion].question}
               </p>
             </div>
-          )}
 
-          {/* Submit/Next Button */}
-          <div className="flex justify-end">
-            {!isSubmitted ? (
-              <button
-                onClick={handleSubmit}
-                disabled={!selectedAnswer}
-                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Submit
-              </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                disabled={currentQuestion >= 19}
-                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {currentQuestion >= 19 ? 'Completed' : 'Next'}
-              </button>
+            {/* Options */}
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
+              {questions[currentQuestion].options.map((option) => {
+                const isSelected = selectedAnswer === option.id;
+                const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
+                
+                let borderColor = 'border-gray-300';
+                let bgColor = 'bg-white';
+                let textColor = 'text-gray-800';
+                
+                if (isSubmitted) {
+                  if (isSelected && !isCorrect) {
+                    borderColor = 'border-orange-500';
+                    bgColor = 'bg-orange-50';
+                    textColor = 'text-orange-600';
+                  } else if (isCorrectAnswer) {
+                    borderColor = 'border-cyan-500';
+                    bgColor = 'bg-cyan-50';
+                    textColor = 'text-cyan-600';
+                  }
+                } else if (isSelected) {
+                  borderColor = 'border-gray-400';
+                  bgColor = 'bg-gray-50';
+                }
+
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => handleAnswerSelect(option.id)}
+                    disabled={isSubmitted}
+                    className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
+                  >
+                    <span className="font-medium">
+                      {option.id}. {option.text}
+                    </span>
+                    {isSubmitted && (
+                      <>
+                        {isSelected && !isCorrect && (
+                          <XCircle className="w-6 h-6 text-orange-500" />
+                        )}
+                        {isCorrectAnswer && (
+                          <CheckCircle className="w-6 h-6 text-cyan-500" />
+                        )}
+                      </>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Feedback Message */}
+            {isSubmitted && (
+              <div className={`mb-8 p-6 rounded-lg border-2 ${
+                isCorrect 
+                  ? 'bg-cyan-50 border-cyan-200' 
+                  : 'bg-orange-50 border-orange-200'
+              }`}>
+                <h3 className={`text-xl font-bold mb-3 ${
+                  isCorrect ? 'text-cyan-600' : 'text-orange-600'
+                }`}>
+                  {isCorrect ? 'Correct!' : 'Oh no!'}
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  &quot;{questions[currentQuestion].explanation}&quot;
+                </p>
+              </div>
             )}
+
+            {/* Submit/Next Button */}
+            <div className="flex justify-end">
+              {!isSubmitted ? (
+                <button
+                  onClick={handleSubmit}
+                  disabled={!selectedAnswer}
+                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Submit
+                </button>
+              ) : (
+                <button
+                  onClick={handleNext}
+                  disabled={currentQuestion >= 19}
+                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {currentQuestion >= 19 ? 'Completed' : 'Next'}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
