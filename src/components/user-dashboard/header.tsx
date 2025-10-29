@@ -1,5 +1,11 @@
 import Image from 'next/image';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, User, Key, LogOut } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   return (
@@ -24,18 +30,26 @@ export default function Header() {
             </span>
             
             {/* Profile dropdown */}
-            <button className="flex items-center gap-2 focus:outline-none">
-              <div className="w-10 h-10 rounded-full bg-gray-200 border-2 border-blue-500 overflow-hidden">
-                <Image
-                  src="/profile.png" // Replace with profile image path
-                  alt="Profile"
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <ChevronDown className="w-5 h-5 text-gray-600" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 focus:outline-none">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 border-2 border-blue-500 flex items-center justify-center">
+                    <User className="w-6 h-6 text-gray-600" />
+                  </div>
+                  <ChevronDown className="w-5 h-5 text-gray-600" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48" align="end">
+                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3">
+                  <Key className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm font-medium">Update Password</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3">
+                  <LogOut className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm font-medium">Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

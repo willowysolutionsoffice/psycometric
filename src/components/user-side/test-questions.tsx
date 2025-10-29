@@ -270,8 +270,8 @@ export default function TestQuestions() {
   const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
 
   return (
-    <div className="min-h-screen bg-orange-50 p-4 md:p-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-orange-50 p-4 md:p-8 flex flex-col items-center justify-center">
+      <div className="w-full mb-12">
         {/* Orange Header with Airplanes */}
         <div className="relative bg-orange-500 rounded-t-3xl p-8 overflow-hidden">
           {/* Decorative circles and airplanes */}
