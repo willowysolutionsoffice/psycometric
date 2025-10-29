@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: (error as z.ZodError).errors },
+        { error: 'Validation error', details: (error as z.ZodError).flatten().fieldErrors },
         { status: 400 }
       )
     }

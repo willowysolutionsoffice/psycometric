@@ -40,7 +40,7 @@ export const streamColumns: ColumnDef<Stream>[] = [
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => <div className="text-right px-3">Actions</div>,
     cell: ({ row }) =>
       row.original && <StreamActions stream={row.original} />,
   },
@@ -51,7 +51,7 @@ export const StreamActions = ({ stream }: { stream: Stream }) => {
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-end gap-2">
       <Button
         variant="ghost"
         size="sm"

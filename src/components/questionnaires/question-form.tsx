@@ -208,20 +208,6 @@ export const QuestionFormDialog = ({ question, open, openChange }: QuestionFormP
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="answerKey"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Correct Answer</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter the correct answer" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <div className="space-y-2">
               <FormLabel>Wrong Answer Options</FormLabel>
               {[0, 1, 2].map((index) => (

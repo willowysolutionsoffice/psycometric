@@ -87,7 +87,7 @@ export function CategoryTable<TValue>({ columns, data }: CategoryTableProps<TVal
         <div className="relative w-full sm:w-1/2 md:w-1/4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Search by Ref no or supplier"
+            placeholder="Search by category name..."
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="pl-9"

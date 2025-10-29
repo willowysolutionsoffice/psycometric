@@ -5,6 +5,13 @@ import { StreamFormDialog } from "@/components/streams/stream-form";
 
 export default async function StreamsPage() {
   const streams = await prisma.stream.findMany();
+  
+  // Convert Date objects to strings
+  const streamsWithStringDates = streams.map(stream => ({
+    ...stream,
+    createdAt: stream.createdAt.toISOString(),
+    updatedAt: stream.updatedAt.toISOString(),
+  }));
 
   return (
     <div className="flex flex-1 flex-col">
@@ -17,7 +24,7 @@ export default async function StreamsPage() {
             </div>
               <StreamFormDialog />
           </div>
-          <StreamTable columns={streamColumns} data={streams} />
+          <StreamTable columns={streamColumns} data={streamsWithStringDates} />
         </div>
       </div>
     </div>

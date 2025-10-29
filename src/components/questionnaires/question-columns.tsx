@@ -55,7 +55,7 @@ export const questionColumns: ColumnDef<Question>[] = [
     accessorKey: "stream.name",
     header: "Stream",
     cell: ({ row }) => (
-      <div className="px-3">
+      <div>
         {(row.original as Question).stream.name}
       </div>
     ),

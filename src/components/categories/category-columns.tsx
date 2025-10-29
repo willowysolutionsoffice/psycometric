@@ -40,7 +40,7 @@ export const categoryColumns: ColumnDef<Category>[] = [
   },
   {
     id: "actions",
-    header: "Actions",
+    header: () => <div className="text-right px-3">Actions</div>,
     cell: ({ row }) =>
       row.original && <CategoryActions category={row.original} />,
   },
@@ -51,7 +51,7 @@ export const CategoryActions = ({ category }: { category: Category }) => {
   const [openEdit, setOpenEdit] = useState(false);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-end gap-2">
       <Button
         variant="ghost"
         size="sm"
