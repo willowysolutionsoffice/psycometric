@@ -1,8 +1,13 @@
 import React from 'react'
+import Header from '@/components/user-dashboard/header'
+import PsychometricDashboard from '@/components/user-dashboard/dashboard'
 
 const HomePage = () => {
   return (
-    <div>HomePage</div>
+    <div>
+      <Header />
+      <PsychometricDashboard />
+    </div>
   );
 };
 
