@@ -114,16 +114,60 @@ export default function TestQuestions() {
         // Convert map back to array
         const uniqueQuestions = Array.from(uniqueQuestionsByText.values());
         
-        // Transform questions
-        const transformedQuestions = uniqueQuestions.map(transformQuestion);
+        // Define personality types
+        const personalityTypes = [
+          'Realistic',
+          'Investigative',
+          'Artistic',
+          'Social',
+          'Enterprising',
+          'Conventional'
+        ];
         
-        // Shuffle the questions array
+        // Group questions by personality type
+        const questionsByType = new Map<string, Question[]>();
+        personalityTypes.forEach(type => {
+          questionsByType.set(type, []);
+        });
+        
+        uniqueQuestions.forEach(question => {
+          const type = question.personalityType?.trim();
+          if (type && questionsByType.has(type)) {
+            questionsByType.get(type)!.push(question);
+          }
+        });
+        
+        // Select 3 questions from each personality type
+        const selectedQuestions: Question[] = [];
+        const usedQuestionIds = new Set<string>();
+        
+        personalityTypes.forEach(type => {
+          const typeQuestions = shuffleArray(questionsByType.get(type) || []);
+          const questionsToAdd = typeQuestions.filter(q => !usedQuestionIds.has(q.id)).slice(0, 3);
+          questionsToAdd.forEach(q => {
+            selectedQuestions.push(q);
+            usedQuestionIds.add(q.id);
+          });
+        });
+        
+        // Calculate how many more questions we need
+        const questionsNeeded = 20 - selectedQuestions.length;
+        
+        // Get remaining questions (not yet selected)
+        const remainingQuestions = uniqueQuestions.filter(q => !usedQuestionIds.has(q.id));
+        const shuffledRemaining = shuffleArray(remainingQuestions);
+        
+        // Add remaining questions randomly to reach 20
+        const additionalQuestions = shuffledRemaining.slice(0, questionsNeeded);
+        selectedQuestions.push(...additionalQuestions);
+        
+        // Transform questions
+        const transformedQuestions = selectedQuestions.map(transformQuestion);
+        
+        // Shuffle the final array to randomize order
         const shuffledQuestions = shuffleArray(transformedQuestions);
         
-        // Limit to only 20 questions
-        const limitedQuestions = shuffledQuestions.slice(0, 20);
-        
-        setQuestions(limitedQuestions);
+        setQuestions(shuffledQuestions);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching questions:', error);
