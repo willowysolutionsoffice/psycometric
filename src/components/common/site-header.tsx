@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 // import { LogoutDialog } from "@/components/auth/logout-modal";
 
 const { defaultTitle } = APP_CONFIG.siteHeader;
@@ -21,7 +20,6 @@ interface SiteHeaderProps {
 
 export function SiteHeader({ title = defaultTitle }: SiteHeaderProps = {}) {
   const router = useRouter();
-  const [logoutOpen, setLogoutOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -29,7 +27,6 @@ export function SiteHeader({ title = defaultTitle }: SiteHeaderProps = {}) {
       await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
       try { localStorage.removeItem('authUser'); } catch {}
     } finally {
-      setLogoutOpen(false);
       router.push('/admin/login');
     }
   };

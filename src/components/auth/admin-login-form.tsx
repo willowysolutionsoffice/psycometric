@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { toast } from 'sonner';
 
 export default function AdminLoginPage({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   const router = useRouter();
@@ -34,14 +35,17 @@ export default function AdminLoginPage({ className, ...props }: HTMLAttributes<H
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setErrorMessage(data?.error || "Invalid email or password");
+        toast.error(data?.error || "Invalid email or password");
         return;
       }
       try {
         localStorage.setItem('authUser', JSON.stringify({ email: values.email, role: 'admin', name: 'Administrator' }));
       } catch {}
+      toast.success('Admin login successful!');
       router.push("/admin/dashboard");
     } catch {
       setErrorMessage("Login failed. Please try again.");
+      toast.error("Login failed. Please try again.");
     } finally {
       setIsExecuting(false);
     }

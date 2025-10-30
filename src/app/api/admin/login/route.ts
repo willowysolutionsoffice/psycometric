@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       maxAge: oneDay,
     });
     return res;
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Login failed" }, { status: 401 });
   }
 }

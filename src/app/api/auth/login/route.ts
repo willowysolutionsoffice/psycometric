@@ -29,6 +29,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Disallow admins from using user login
+    if ((user.role || '').toLowerCase() === 'admin') {
+      return NextResponse.json(
+        { error: "User can only login" },
+        { status: 403 }
+      );
+    }
+
     // Check if user is banned
     if (user.banned) {
       return NextResponse.json(

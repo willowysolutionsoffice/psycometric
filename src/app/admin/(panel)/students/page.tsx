@@ -30,7 +30,10 @@ export default function StudentsPage() {
       const response = await fetch('/api/users')
       if (response.ok) {
         const data = await response.json()
-        setUsers(data)
+        const onlyStudents = Array.isArray(data)
+          ? data.filter((u: User) => (u.role || '').toLowerCase() !== 'admin')
+          : []
+        setUsers(onlyStudents)
       } else {
         toast.error('Failed to fetch users')
       }
