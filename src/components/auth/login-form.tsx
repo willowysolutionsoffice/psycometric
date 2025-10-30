@@ -42,8 +42,11 @@ const LoginPage = () => {
       });
 
       if (response.ok) {
-        const user = await response.json();
-        console.log('Login successful:', user);
+        const data = await response.json();
+        try {
+          // Persist minimal user info for later API calls
+          localStorage.setItem('authUser', JSON.stringify(data.user));
+        } catch {}
         router.push('/');
       } else {
         const errorData = await response.json();

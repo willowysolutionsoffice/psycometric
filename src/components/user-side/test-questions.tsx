@@ -22,6 +22,7 @@ interface DisplayQuestion {
   options: { id: string; text: string }[];
   correctAnswer: string;
   explanation?: string;
+  personalityType?: string | null;
 }
 
 function transformQuestion(dbQuestion: Question): DisplayQuestion {
@@ -59,6 +60,7 @@ function transformQuestion(dbQuestion: Question): DisplayQuestion {
     question: dbQuestion.question,
     options: shuffledOptions,
     correctAnswer: newCorrectAnswer,
+    personalityType: dbQuestion.personalityType ?? null,
   };
 }
 
@@ -72,6 +74,35 @@ export default function TestQuestions() {
   const [completedQuestions, setCompletedQuestions] = useState(0);
  // Timer setup: start from 15 minutes (900 seconds)
   const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
+  const [score, setScore] = useState(0);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [correctByType, setCorrectByType] = useState<Record<string, number>>({});
+  const [totalByType, setTotalByType] = useState<Record<string, number>>({});
+
+  // On mount, read user and prevent re-attempt if result exists
+  useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
+      if (!raw) {
+        router.push('/login');
+        return;
+      }
+      if (raw) {
+        const user = JSON.parse(raw) as { id?: string };
+        if (user?.id) {
+          setUserId(user.id);
+          fetch(`/api/results?userId=${user.id}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data?.exists) {
+                router.push('/interest-result');
+              }
+            })
+            .catch(() => {});
+        }
+      }
+    } catch {}
+  }, [router]);
 
   // Fetch questions from database
   useEffect(() => {
@@ -157,6 +188,14 @@ export default function TestQuestions() {
         const shuffledQuestions = shuffleArray(transformedQuestions);
         
         setQuestions(shuffledQuestions);
+        // derive totals per personality type for scaling results later
+        const totals: Record<string, number> = {};
+        shuffledQuestions.forEach(q => {
+          const t = (q.personalityType || '').trim();
+          if (!t) return;
+          totals[t] = (totals[t] || 0) + 1;
+        });
+        setTotalByType(totals);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching questions:', error);
@@ -193,11 +232,34 @@ const formatTime = (seconds: number) => {
   const handleSubmit = () => {
     setIsSubmitted(true);
     setCompletedQuestions(completedQuestions + 1);
+    if (selectedAnswer && selectedAnswer === questions[currentQuestion].correctAnswer) {
+      setScore(prev => prev + 1);
+      const t = (questions[currentQuestion].personalityType || '').trim();
+      if (t) {
+        setCorrectByType(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
+      }
+    }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     // If this is the last question (question 20), redirect to interest result page
     if (currentQuestion >= 19) {
+      // Submit final result before redirect
+      const uid = userId;
+      if (uid) {
+        try {
+          const res = await fetch('/api/results', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              userId: uid, 
+              score,
+              details: { byType: correctByType, totals: totalByType }
+            }),
+          });
+          // If already exists (409), proceed anyway
+        } catch {}
+      }
       router.push('/interest-result');
       return;
     }
@@ -248,6 +310,10 @@ const formatTime = (seconds: number) => {
 
           {/* Right side icons */}
           <div className="flex items-center gap-4">
+            {/* Dynamic Score */}
+            <div className="text-orange-600 font-semibold">
+              Score: {score}
+            </div>
 
             {/* Progress Circle */}
             <div className="relative w-14 h-14">

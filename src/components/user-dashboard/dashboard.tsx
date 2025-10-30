@@ -1,10 +1,33 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation'; // ✅ added import
 
 export default function PsychometricDashboard() {
   const router = useRouter(); // ✅ initialize router
+  const [hasAttempted, setHasAttempted] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Require login to access dashboard
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
+      if (!raw) {
+        router.push('/login');
+        return;
+      }
+    } catch {}
+
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
+      if (!raw) return;
+      const user = JSON.parse(raw) as { id?: string };
+      if (!user?.id) return;
+      fetch(`/api/results?userId=${user.id}`)
+        .then(res => res.json())
+        .then(data => setHasAttempted(Boolean(data?.exists)))
+        .catch(() => {});
+    } catch {}
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -43,13 +66,13 @@ export default function PsychometricDashboard() {
           </div>
         </div>
         
-        {/* Get Started Button */}
+        {/* Get Started / View Result Button */}
         <div className="flex justify-center mt-8">
           <button
-            onClick={() => router.push('/test-questions')} // ✅ navigate to test-questions
+            onClick={() => router.push(hasAttempted ? '/interest-result' : '/test-questions')} // ✅ navigate accordingly
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-12 py-4 rounded-lg shadow-lg transition-colors duration-200 text-lg"
           >
-            Get Started
+            {hasAttempted ? 'View Result' : 'Get Started'}
           </button>
         </div>
       </div>
