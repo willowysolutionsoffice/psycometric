@@ -279,7 +279,7 @@ export default function TestQuestions() {
 
   const confirmLeave = () => {
     try { sessionStorage.removeItem('testInProgress'); } catch {}
-    window.location.reload(); // Reset the test fully.
+    router.push('/'); // Go to homepage instead of reload
   };
 
   const cancelLeave = () => {
