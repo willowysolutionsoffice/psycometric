@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import type { Prisma } from '@prisma/client'
 
 // GET - Fetch a single user by ID
 export async function GET(
@@ -50,7 +51,7 @@ export async function PUT(
     const body = await request.json()
     const { name, email, phoneNumber, stream, password } = body
 
-    const updateData: any = {
+    const updateData: Prisma.UserUpdateInput = {
       name,
       email,
       phoneNumber,
