@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
-import { Trash2, Calendar, Mail, Phone, GraduationCap } from 'lucide-react'
+import { Trash2, Calendar, Mail, Phone, GraduationCap, Eye } from 'lucide-react'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 
 interface User {
@@ -23,6 +24,18 @@ interface User {
 export default function StudentsPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
+  const [viewOpen, setViewOpen] = useState(false)
+  const [viewUser, setViewUser] = useState<User | null>(null)
+  const [resultLoading, setResultLoading] = useState(false)
+  const [resultError, setResultError] = useState<string | null>(null)
+  const [resultData, setResultData] = useState<
+    | null
+    | {
+        score?: number
+        attemptedAt?: string
+        details?: { byType?: Record<string, number>; totals?: Record<string, number> }
+      }
+  >(null)
 
   // Fetch users
   const fetchUsers = async () => {
@@ -47,6 +60,31 @@ export default function StudentsPage() {
   useEffect(() => {
     fetchUsers()
   }, [])
+
+  const handleViewUser = async (user: User) => {
+    setViewUser(user)
+    setResultLoading(true)
+    setResultError(null)
+    setResultData(null)
+    setViewOpen(true)
+    try {
+      const res = await fetch(`/api/results?userId=${user.id}`)
+      if (!res.ok) throw new Error('Failed to fetch result')
+      const data = await res.json()
+      // Expected shape: { exists: boolean, result?: {...} } OR direct result
+      if (data?.exists === false) {
+        setResultData(null)
+      } else if (data?.result) {
+        setResultData(data.result)
+      } else {
+        setResultData(data)
+      }
+    } catch {
+      setResultError('Failed to load test result')
+    } finally {
+      setResultLoading(false)
+    }
+  }
 
 
   // Delete user
@@ -172,6 +210,10 @@ export default function StudentsPage() {
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
+                      <div className="inline-flex items-center gap-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewUser(user)} title="View details">
+                          <Eye className="w-4 h-4" />
+                        </Button>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <Button variant="ghost" size="sm">
@@ -196,6 +238,7 @@ export default function StudentsPage() {
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -204,6 +247,90 @@ export default function StudentsPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* View Student Modal */}
+      <Dialog open={viewOpen} onOpenChange={setViewOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Student Details</DialogTitle>
+            <DialogDescription>View profile and test result</DialogDescription>
+          </DialogHeader>
+          {viewUser && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-gray-500">Name</div>
+                  <div className="font-medium">{viewUser.name}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Email</div>
+                  <div className="font-medium break-all">{viewUser.email}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Phone</div>
+                  <div className="font-medium">{viewUser.phoneNumber || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-gray-500">Stream</div>
+                  <div className="font-medium">{viewUser.stream || '-'}</div>
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <div className="text-sm text-gray-500 mb-2">Test Result</div>
+                {resultLoading ? (
+                  <div className="text-sm text-gray-600">Loading...</div>
+                ) : resultError ? (
+                  <div className="text-sm text-red-600">{resultError}</div>
+                ) : !resultData ? (
+                  <div className="text-sm">Not attended</div>
+                ) : (
+                  (() => {
+                    const byType = resultData?.details?.byType || {}
+                    const order = [
+                      'Realistic',
+                      'Investigative',
+                      'Artistic',
+                      'Social',
+                      'Enterprising',
+                      'Conventional',
+                    ]
+                    const rows = order.map((k) => ({ type: k, score: Number(byType[k] ?? 0) }))
+                    const total = rows.reduce((sum, r) => sum + r.score, 0)
+                    return (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Personality Type</TableHead>
+                            <TableHead className="text-right">Score</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {rows.map((r) => (
+                            <TableRow key={r.type}>
+                              <TableCell>{r.type}</TableCell>
+                              <TableCell className="text-right font-medium">{r.score}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                        <tfoot>
+                          <TableRow>
+                            <TableCell className="font-semibold">Total</TableCell>
+                            <TableCell className="text-right font-semibold">{total}</TableCell>
+                          </TableRow>
+                        </tfoot>
+                      </Table>
+                    )
+                  })()
+                )}
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setViewOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   )
