@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import { ChevronDown, User, Key, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   DropdownMenu,
@@ -12,17 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function Header() {
-  const [userName, setUserName] = useState<string>('');
-  const router = useRouter();
-
-  useEffect(() => {
+  const [userName] = useState<string>(() => {
     try {
       const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
-      if (!raw) return;
+      if (!raw) return '';
       const user = JSON.parse(raw) as { name?: string };
-      if (user?.name) setUserName(user.name);
-    } catch {}
-  }, []);
+      return user?.name ?? '';
+    } catch {
+      return '';
+    }
+  });
+  const router = useRouter();
 
   const handleLogout = () => {
     try {
