@@ -20,6 +20,7 @@ import Image from "next/image";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
+import { toast } from 'sonner';
 
 import { signupSchema, type SignupValues } from "@/schemas/user-schema";
 
@@ -73,19 +74,18 @@ const SignUpPage = () => {
           password: values.password,
         }),
       });
-
       if (response.ok) {
-        const user = await response.json();
-        console.log('User created successfully:', user);
-        // Redirect to login page or dashboard
+        toast.success('Account created successfully!');
         router.push('/login');
       } else {
         const errorData = await response.json();
         setFormError(errorData.error || 'Failed to create account. Please try again.');
+        toast.error(errorData.error || 'Failed to create account. Please try again.');
       }
     } catch (err) {
-      console.error("Sign up error:", err);
-      setFormError("Something went wrong. Please try again.");
+      console.error('Sign up error:', err);
+      setFormError('Something went wrong. Please try again.');
+      toast.error('Something went wrong. Please try again.');
     }
   };
 
@@ -125,27 +125,27 @@ const SignUpPage = () => {
       </div>
 
       {/* Right Panel - Sign Up Form (40% width on desktop, full width on mobile) */}
-      <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-6 bg-white overflow-y-auto">
+      <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-4 sm:py-5 bg-white overflow-y-auto">
         <div className="max-w-md mx-auto w-full">
           {/* Branding Section */}
           <div className="mb-4 sm:mb-6 text-center flex flex-col items-center justify-center">
             {/* Logo */}
             <Image
-              src="/images/psycologo.png"
-              alt="Psycho Logo"
-              width={80}
-              height={80}
-              className="rounded-full bg-white/20 backdrop-blur-sm p-2 mb-2 w-16 h-16 sm:w-20 sm:h-20"
-              priority
-            />
+            src="/images/psycologo.png"
+            alt="Psycho Logo"
+            width={130}
+            height={130}
+            className="rounded-full bg-white/20 backdrop-blur-sm p-2"
+            priority
+          />
             
             {/* Get Started Heading */}
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
               Get Started
             </h2>
             
             {/* Sign-up specific content */}
-            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1">
+            <h3 className="text-sm sm:text-base font-semibold text-foreground mb-1">
               Create Your Account
             </h3>
             <p className="text-text-subtle text-xs sm:text-sm">

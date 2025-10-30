@@ -15,6 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { loginSchema, type LoginValues } from "@/schemas/user-schema";
+import { toast } from 'sonner';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -40,21 +41,22 @@ const LoginPage = () => {
         },
         body: JSON.stringify(data),
       });
-
       if (response.ok) {
         const data = await response.json();
         try {
-          // Persist minimal user info for later API calls
           localStorage.setItem('authUser', JSON.stringify(data.user));
         } catch {}
+        toast.success('Login successful!');
         router.push('/');
       } else {
         const errorData = await response.json();
         setFormError(errorData.error || 'Invalid email or password');
+        toast.error(errorData.error || 'Invalid email or password');
       }
     } catch (error) {
-      console.error("Login error:", error);
-      setFormError("Login failed. Please try again.");
+      console.error('Login error:', error);
+      setFormError('Login failed. Please try again.');
+      toast.error('Login failed. Please try again.');
     }
   };
 
@@ -94,27 +96,27 @@ const LoginPage = () => {
       </div>
 
       {/* Right Panel - Login Form (40% width on desktop, full width on mobile) */}
-          <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-8 bg-white grow">
+          <div className="w-full lg:w-2/5 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 py-6 bg-white grow">
         <div className="max-w-md mx-auto w-full">
           {/* Branding Section */}
           <div className="mb-6 sm:mb-8 lg:mb-10 text-center flex flex-col items-center justify-center">
             {/* Logo */}
             <Image
-              src="/images/psycologo.png"
-              alt="Psycho Logo"
-              width={120}
-              height={120}
-              className="rounded-full bg-white/20 backdrop-blur-sm p-2 mb-3 sm:mb-4 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32"
-              priority
-            />
+            src="/images/psycologo.png"
+            alt="Psycho Logo"
+            width={130}
+            height={130}
+            className="rounded-full bg-white/20 backdrop-blur-sm p-4"
+            priority
+          />
             
             {/* Get Started Heading */}
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
               Get Started
             </h2>
             
             {/* Login specific content */}
-            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
               Sign In To Your Account
             </h3>
           </div>

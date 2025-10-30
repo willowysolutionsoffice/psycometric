@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, User} from 'lucide-react';
+import { User} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Question } from '@/types/question';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -78,6 +78,7 @@ export default function TestQuestions() {
   const [loading, setLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  // We no longer show correctness feedback; submission step removed
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [completedQuestions, setCompletedQuestions] = useState(0);
   // const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
@@ -303,19 +304,17 @@ const formatTime = (seconds: number) => {
     }
   };
 
-  const handleSubmit = () => {
-    setIsSubmitted(true);
+  const handleNext = async () => {
+    if (!selectedAnswer) return;
+    // Increment progress and score silently (no feedback UI)
     setCompletedQuestions(completedQuestions + 1);
-    if (selectedAnswer && selectedAnswer === questions[currentQuestion].correctAnswer) {
+    if (selectedAnswer === questions[currentQuestion].correctAnswer) {
       setScore(prev => prev + 1);
       const t = (questions[currentQuestion].personalityType || '').trim();
       if (t) {
         setCorrectByType(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
       }
     }
-  };
-
-  const handleNext = async () => {
     // If this is the last question (question 20), redirect to interest result page
     if (currentQuestion >= 19) {
       // Submit final result before redirect
@@ -368,7 +367,7 @@ const formatTime = (seconds: number) => {
     );
   }
 
-  const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
+  // correctness is computed internally on next; no UI feedback
   const totalQuestions = 20; // Fixed limit of 20 questions
   const progressPercentage = (completedQuestions / totalQuestions) * 100;
 
@@ -397,11 +396,6 @@ const formatTime = (seconds: number) => {
 
           {/* Right side icons */}
           <div className="flex items-center gap-4">
-            {/* Dynamic Score */}
-            <div className="text-orange-600 font-semibold">
-              Score: {score}
-            </div>
-
             {/* Progress Circle */}
             <div className="relative w-14 h-14">
               {/* Background circle */}
@@ -492,26 +486,16 @@ const formatTime = (seconds: number) => {
           </div>
 
           {/* Options */}
-          <div className="grid md:grid-cols-2 gap-4 mb-8">
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
               {questions[currentQuestion].options.map((option, index) => {
               const isSelected = selectedAnswer === option.id;
-              const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
+                // No correctness visuals
               
               let borderColor = 'border-gray-300';
               let bgColor = 'bg-white';
-              let textColor = 'text-gray-800';
+              const textColor = 'text-gray-800';
               
-              if (isSubmitted) {
-                if (isSelected && !isCorrect) {
-                  borderColor = 'border-orange-500';
-                  bgColor = 'bg-orange-50';
-                  textColor = 'text-orange-600';
-                } else if (isCorrectAnswer) {
-                  borderColor = 'border-cyan-500';
-                  bgColor = 'bg-cyan-50';
-                  textColor = 'text-cyan-600';
-                }
-              } else if (isSelected) {
+                if (isSelected) {
                 borderColor = 'border-gray-400';
                 bgColor = 'bg-gray-50';
               }
@@ -520,65 +504,26 @@ const formatTime = (seconds: number) => {
                 <button
                     key={`${questions[currentQuestion].id}-${option.id}-${index}`}
                   onClick={() => handleAnswerSelect(option.id)}
-                  disabled={isSubmitted}
+                    disabled={false}
                   className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
                 >
                   <span className="font-medium">
                     {option.id}. {option.text}
                   </span>
-                  {isSubmitted && (
-                    <>
-                      {isSelected && !isCorrect && (
-                        <XCircle className="w-6 h-6 text-orange-500" />
-                      )}
-                      {isCorrectAnswer && (
-                        <CheckCircle className="w-6 h-6 text-cyan-500" />
-                      )}
-                    </>
-                  )}
                 </button>
               );
             })}
           </div>
 
-          {/* Feedback Message */}
-          {isSubmitted && (
-            <div className={`mb-8 p-6 rounded-lg border-2 ${
-              isCorrect 
-                ? 'bg-cyan-50 border-cyan-200' 
-                : 'bg-orange-50 border-orange-200'
-            }`}>
-              <h3 className={`text-xl font-bold mb-3 ${
-                isCorrect ? 'text-cyan-600' : 'text-orange-600'
-              }`}>
-                  {isCorrect ? 'Correct!' : 'Incorrect!'}
-              </h3>
-                {questions[currentQuestion].explanation && (
-              <p className="text-gray-700 leading-relaxed">
-                &quot;{questions[currentQuestion].explanation}&quot;
-              </p>
-                )}
-            </div>
-          )}
-
           {/* Submit/Next Button */}
           <div className="flex justify-end">
-            {!isSubmitted ? (
               <button
-                onClick={handleSubmit}
+                onClick={handleNext}
                 disabled={!selectedAnswer}
                 className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit
+                {currentQuestion >= 19 ? 'Finish' : 'Next'}
               </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all"
-              >
-                  {currentQuestion >= 19 ? 'View Results' : 'Next'}
-              </button>
-            )}
             </div>
           </div>
         </div>
