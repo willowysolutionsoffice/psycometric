@@ -88,8 +88,8 @@ export default function TestQuestions() {
   const [correctByType, setCorrectByType] = useState<Record<string, number>>({});
   const [totalByType, setTotalByType] = useState<Record<string, number>>({});
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [showRestoreModal, setShowRestoreModal] = useState(false);
-  const [pendingHref, setPendingHref] = useState<string | null>(null);
+  // Removed auto restore modal; only show modal on back/navigation
+  // No need to track pending href; restart always navigates home
 
   // On mount, read user and prevent re-attempt if result exists
   useEffect(() => {
@@ -218,13 +218,9 @@ export default function TestQuestions() {
     fetchQuestions();
   }, []);
 
-  // Mark test as in-progress, and show restore modal if a previous session existed
+  // Mark test as in-progress (no restore modal on mount)
   useEffect(() => {
     try {
-      const existed = typeof window !== 'undefined' ? sessionStorage.getItem('testInProgress') : null;
-      if (existed) {
-        setShowRestoreModal(true);
-      }
       sessionStorage.setItem('testInProgress', 'true');
     } catch {}
   }, []);
@@ -249,7 +245,6 @@ export default function TestQuestions() {
     const onPopState = () => {
       // Neutralize back and show modal
       push();
-      setPendingHref(null);
       setShowLeaveModal(true);
     };
     window.addEventListener('popstate', onPopState);
@@ -270,7 +265,6 @@ export default function TestQuestions() {
       if (!href || href.startsWith('#')) return;
       // Prevent default and show modal
       e.preventDefault();
-      setPendingHref(href);
       setShowLeaveModal(true);
     };
     document.addEventListener('click', clickHandler, true);
@@ -283,7 +277,6 @@ export default function TestQuestions() {
   };
 
   const cancelLeave = () => {
-    setPendingHref(null);
     setShowLeaveModal(false);
   };
 
@@ -397,24 +390,7 @@ const formatTime = (seconds: number) => {
         </DialogContent>
       </Dialog>
 
-      {/* Restore Modal (on reload/new mount after an in-progress session) */}
-      <Dialog open={showRestoreModal} onOpenChange={setShowRestoreModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Test restarted</DialogTitle>
-            <DialogDescription>
-              A previous test session was detected. Progress wasn&apos;t saved. You will start again from question 1.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="sm:justify-end">
-            <Button
-              onClick={() => {
-                setShowRestoreModal(false);
-              }}
-            >OK</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* No restore modal on mount */}
       {/* Top Header Bar */}
       <div className="bg-orange-50 px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-end">
@@ -469,140 +445,140 @@ const formatTime = (seconds: number) => {
 
       {/* Main Content */}
       <div className="px-4 pb-8">
-        <div className="max-w-5xl mx-auto">
-          {/* Orange Header with Airplanes */}
-          <div className="relative bg-orange-500 rounded-t-3xl p-8 overflow-hidden">
-            {/* Decorative circles and airplanes */}
-            <div className="absolute top-4 left-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
-            <div className="absolute top-4 right-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
-            
-            {/* Airplane icons */}
-            <div className="absolute top-12 left-32">
-              <svg className="w-12 h-12 text-orange-400 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-              </svg>
-            </div>
-            <div className="absolute top-8 left-1/2">
-              <svg className="w-10 h-10 text-orange-400 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-              </svg>
-            </div>
-            <div className="absolute top-16 right-32">
-              <svg className="w-12 h-12 text-orange-400 transform rotate-45" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
-              </svg>
-            </div>
+      <div className="max-w-5xl mx-auto">
+        {/* Orange Header with Airplanes */}
+        <div className="relative bg-orange-500 rounded-t-3xl p-8 overflow-hidden">
+          {/* Decorative circles and airplanes */}
+          <div className="absolute top-4 left-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
+          <div className="absolute top-4 right-20 w-16 h-16 border-4 border-orange-400 border-dashed rounded-full opacity-60"></div>
+          
+          {/* Airplane icons */}
+          <div className="absolute top-12 left-32">
+            <svg className="w-12 h-12 text-orange-400 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+          </div>
+          <div className="absolute top-8 left-1/2">
+            <svg className="w-10 h-10 text-orange-400 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+          </div>
+          <div className="absolute top-16 right-32">
+            <svg className="w-12 h-12 text-orange-400 transform rotate-45" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </svg>
+          </div>
 
             {/* Question Counter and Timer */}
             <div className="relative text-center space-y-3">
-              <div className="inline-block bg-white px-6 py-2 rounded-full shadow-md">
-                <span className="text-orange-500 font-semibold">
-                  Question {currentQuestion + 1}/20
-                </span>
-              </div>
+            <div className="inline-block bg-white px-6 py-2 rounded-full shadow-md">
+              <span className="text-orange-500 font-semibold">
+                Question {currentQuestion + 1}/20
+              </span>
+            </div>
               <div className="text-white text-sm font-medium">
                 Time: {formatTime(timer)}
               </div>
-            </div>
+          </div>
+        </div>
+
+        {/* White Content Area */}
+        <div className="bg-white rounded-b-3xl shadow-xl p-8 md:p-12">
+          {/* Question */}
+          <div className="mb-12">
+            <p className="text-xl md:text-2xl text-gray-800 text-center font-medium">
+              {questions[currentQuestion].question}
+            </p>
           </div>
 
-          {/* White Content Area */}
-          <div className="bg-white rounded-b-3xl shadow-xl p-8 md:p-12">
-            {/* Question */}
-            <div className="mb-12">
-              <p className="text-xl md:text-2xl text-gray-800 text-center font-medium">
-                {questions[currentQuestion].question}
-              </p>
-            </div>
-
-            {/* Options */}
-            <div className="grid md:grid-cols-2 gap-4 mb-8">
+          {/* Options */}
+          <div className="grid md:grid-cols-2 gap-4 mb-8">
               {questions[currentQuestion].options.map((option, index) => {
-                const isSelected = selectedAnswer === option.id;
-                const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
-                
-                let borderColor = 'border-gray-300';
-                let bgColor = 'bg-white';
-                let textColor = 'text-gray-800';
-                
-                if (isSubmitted) {
-                  if (isSelected && !isCorrect) {
-                    borderColor = 'border-orange-500';
-                    bgColor = 'bg-orange-50';
-                    textColor = 'text-orange-600';
-                  } else if (isCorrectAnswer) {
-                    borderColor = 'border-cyan-500';
-                    bgColor = 'bg-cyan-50';
-                    textColor = 'text-cyan-600';
-                  }
-                } else if (isSelected) {
-                  borderColor = 'border-gray-400';
-                  bgColor = 'bg-gray-50';
+              const isSelected = selectedAnswer === option.id;
+              const isCorrectAnswer = option.id === questions[currentQuestion].correctAnswer;
+              
+              let borderColor = 'border-gray-300';
+              let bgColor = 'bg-white';
+              let textColor = 'text-gray-800';
+              
+              if (isSubmitted) {
+                if (isSelected && !isCorrect) {
+                  borderColor = 'border-orange-500';
+                  bgColor = 'bg-orange-50';
+                  textColor = 'text-orange-600';
+                } else if (isCorrectAnswer) {
+                  borderColor = 'border-cyan-500';
+                  bgColor = 'bg-cyan-50';
+                  textColor = 'text-cyan-600';
                 }
+              } else if (isSelected) {
+                borderColor = 'border-gray-400';
+                bgColor = 'bg-gray-50';
+              }
 
-                return (
-                  <button
+              return (
+                <button
                     key={`${questions[currentQuestion].id}-${option.id}-${index}`}
-                    onClick={() => handleAnswerSelect(option.id)}
-                    disabled={isSubmitted}
-                    className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
-                  >
-                    <span className="font-medium">
-                      {option.id}. {option.text}
-                    </span>
-                    {isSubmitted && (
-                      <>
-                        {isSelected && !isCorrect && (
-                          <XCircle className="w-6 h-6 text-orange-500" />
-                        )}
-                        {isCorrectAnswer && (
-                          <CheckCircle className="w-6 h-6 text-cyan-500" />
-                        )}
-                      </>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                  onClick={() => handleAnswerSelect(option.id)}
+                  disabled={isSubmitted}
+                  className={`${bgColor} ${borderColor} ${textColor} border-2 rounded-lg p-4 text-left transition-all hover:shadow-md disabled:cursor-not-allowed flex items-center justify-between`}
+                >
+                  <span className="font-medium">
+                    {option.id}. {option.text}
+                  </span>
+                  {isSubmitted && (
+                    <>
+                      {isSelected && !isCorrect && (
+                        <XCircle className="w-6 h-6 text-orange-500" />
+                      )}
+                      {isCorrectAnswer && (
+                        <CheckCircle className="w-6 h-6 text-cyan-500" />
+                      )}
+                    </>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-            {/* Feedback Message */}
-            {isSubmitted && (
-              <div className={`mb-8 p-6 rounded-lg border-2 ${
-                isCorrect 
-                  ? 'bg-cyan-50 border-cyan-200' 
-                  : 'bg-orange-50 border-orange-200'
+          {/* Feedback Message */}
+          {isSubmitted && (
+            <div className={`mb-8 p-6 rounded-lg border-2 ${
+              isCorrect 
+                ? 'bg-cyan-50 border-cyan-200' 
+                : 'bg-orange-50 border-orange-200'
+            }`}>
+              <h3 className={`text-xl font-bold mb-3 ${
+                isCorrect ? 'text-cyan-600' : 'text-orange-600'
               }`}>
-                <h3 className={`text-xl font-bold mb-3 ${
-                  isCorrect ? 'text-cyan-600' : 'text-orange-600'
-                }`}>
                   {isCorrect ? 'Correct!' : 'Incorrect!'}
-                </h3>
+              </h3>
                 {questions[currentQuestion].explanation && (
-                <p className="text-gray-700 leading-relaxed">
-                  &quot;{questions[currentQuestion].explanation}&quot;
-                </p>
+              <p className="text-gray-700 leading-relaxed">
+                &quot;{questions[currentQuestion].explanation}&quot;
+              </p>
                 )}
-              </div>
-            )}
+            </div>
+          )}
 
-            {/* Submit/Next Button */}
-            <div className="flex justify-end">
-              {!isSubmitted ? (
-                <button
-                  onClick={handleSubmit}
-                  disabled={!selectedAnswer}
-                  className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Submit
-                </button>
-              ) : (
-                <button
-                  onClick={handleNext}
+          {/* Submit/Next Button */}
+          <div className="flex justify-end">
+            {!isSubmitted ? (
+              <button
+                onClick={handleSubmit}
+                disabled={!selectedAnswer}
+                className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
                   className="bg-orange-400 hover:bg-orange-500 text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all"
-                >
+              >
                   {currentQuestion >= 19 ? 'View Results' : 'Next'}
-                </button>
-              )}
+              </button>
+            )}
             </div>
           </div>
         </div>
