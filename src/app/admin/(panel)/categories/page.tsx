@@ -1,6 +1,6 @@
 import { categoryColumns } from "@/components/categories/category-columns";
 import { CategoryTable } from "@/components/categories/category-table";
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { CategoryFormDialog } from "@/components/categories/category-form";
 
 export default async function CategoryPage() {
@@ -15,7 +15,7 @@ export default async function CategoryPage() {
               <h1 className="text-2xl font-bold tracking-tight">Category</h1>
               <p className="text-muted-foreground">Manage your Category</p>
             </div>
-              <CategoryFormDialog />
+            <CategoryFormDialog />
           </div>
           <CategoryTable columns={categoryColumns} data={category} />
         </div>
@@ -23,3 +23,4 @@ export default async function CategoryPage() {
     </div>
   );
 }
+

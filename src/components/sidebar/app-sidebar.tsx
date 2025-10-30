@@ -4,26 +4,28 @@ import Link from "next/link";
 import { IconInnerShadowTop } from "@tabler/icons-react";
 
 import { NavMain } from "@/components/sidebar/nav-main";
+import { NavUser } from "@/components/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { SIDEBAR_DATA, COMPANY_INFO } from "@/constants/navigation";
-import { UserProfile } from "@/types/user";
+import type { UserProfile } from "@/types/navigation";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   user?: UserProfile;
 }
 
-export function AppSidebar({ ...props }: AppSidebarProps) {
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader  className="bg-secondary text-secondary-foreground">
-        <SidebarMenu>
+      <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -39,11 +41,10 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-secondary text-secondary-foreground">
         <NavMain items={SIDEBAR_DATA.navMain} />
-
       </SidebarContent>
-        {/* <SidebarFooter className="bg-sidebar-primary text-primary-foreground"><NavUser /></SidebarFooter> */}
+      <SidebarFooter className="bg-secondary text-secondary-foreground">{user && <NavUser user={user} />}</SidebarFooter>
     </Sidebar>
   );
 }

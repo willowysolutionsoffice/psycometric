@@ -1,9 +1,8 @@
 import React from 'react'
 
-const page = () => {
+export default function ResultsPage() {
   return (
     <div>page</div>
   )
 }
 
-export default page

@@ -1,6 +1,6 @@
 import { questionColumns } from "@/components/questionnaires/question-columns";
 import { QuestionTable } from "@/components/questionnaires/question-table";
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { QuestionFormDialog } from "@/components/questionnaires/question-form";
 
 export default async function QuestionariesPage() {
@@ -20,7 +20,7 @@ export default async function QuestionariesPage() {
               <h1 className="text-2xl font-bold tracking-tight">Questions</h1>
               <p className="text-muted-foreground">Manage your Questions</p>
             </div>
-              <QuestionFormDialog />
+            <QuestionFormDialog />
           </div>
           <QuestionTable columns={questionColumns} data={questions} />
         </div>
@@ -28,3 +28,4 @@ export default async function QuestionariesPage() {
     </div>
   );
 }
+

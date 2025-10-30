@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -56,36 +57,30 @@ async function main() {
     create: { name: 'Personality' },
   });
 
-  // Each question will have options (array of 4)
-  const questions = [
 
-    {
-      question: 'Which activity best reflects an enterprising personality?',
-      options: [
-        'Creating business plans and leading a team',
-        'Conducting scientific experiments',
-        'Designing artwork or creative projects',
-        'Working independently on data analysis'
-      ],
-      answerKey: 'Creating business plans and leading a team',
-      categoryId: personalityCategory.id,
-      streamId: personalityStream.id,
-      personalityType: personalityTypes[4], // Enterprising
+  // Create an admin user (idempotent upsert by email)
+  const adminEmail = 'admin@gmail.com';
+  const adminPasswordPlain = 'admin123';
+  const adminHashed = await bcrypt.hash(adminPasswordPlain, 10);
+
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      role: 'admin',
+      password: adminHashed,
+      name: 'Administrator',
     },
-  ];
+    create: {
+      name: 'Administrator',
+      email: adminEmail,
+      password: adminHashed,
+      role: 'admin',
+      emailVerified: true,
+    },
+  });
 
-  console.log('📝 Inserting questions...');
-
-  for (const q of questions) {
-    try {
-      await prisma.question.create({ data: q });
-      console.log(`✅ Created question: ${q.question.substring(0, 50)}...`);
-    } catch (error) {
-      console.error(`❌ Failed to create question: ${q.question.substring(0, 50)}...`, error);
-    }
-  }
-
-  console.log(`\n✅ Successfully inserted ${questions.length} questions!`);
+  // Questions are seeded elsewhere; only ensuring admin user exists here.
+  console.log('✅ Ensured admin user exists');
 }
 
 main()

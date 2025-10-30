@@ -75,24 +75,6 @@ export function NavUser({ user }: NavUserProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {/* <DropdownMenuItem asChild>
-                <Link href="/profile">
-                  <IconUserCircle />
-                  Account
-                </Link>
-              </DropdownMenuItem> */}
-              {/* <DropdownMenuItem asChild>
-                <Link href="/billing">
-                  <IconCreditCard />
-                  Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/notifications">
-                  <IconNotification />
-                  Notifications
-                </Link>
-              </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuItem
             className='text-destructive'
@@ -105,12 +87,7 @@ export function NavUser({ user }: NavUserProps) {
 
         <LogoutDialog 
         open={openDelete}
-        onOpenChange={setOpenDelete}
-        onConfirm={() => {
-          setOpenDelete(false);
-          // Add your logout logic here
-          console.log('User logged out');
-        }}/>
+        setOpen={setOpenDelete}/>
       </SidebarMenuItem>
     </SidebarMenu>
   );

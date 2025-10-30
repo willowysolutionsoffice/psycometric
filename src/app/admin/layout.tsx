@@ -1,33 +1,15 @@
 import type { Metadata } from "next";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { SiteHeader } from "@/components/common/site-header";
-import { APP_CONFIG, theme } from "@/config/app";
+import { APP_CONFIG } from "@/config/app";
 
 export const metadata: Metadata = {
   title: APP_CONFIG.name,
   description: APP_CONFIG.description,
 };
 
-export default function AdminLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": theme.sidebarWidth,
-          "--header-height": theme.headerHeight,
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar/>
-      <SidebarInset>
-        <SiteHeader />
-        <main className="p-6">{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
-  );
+export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // Minimal base layout: no sidebar/header here.
+  // The admin shell lives in /admin/(panel)/layout.tsx
+  return <>{children}</>;
 }
+
+

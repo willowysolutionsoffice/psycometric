@@ -1,12 +1,10 @@
 import { streamColumns } from "@/components/streams/stream-columns";
 import { StreamTable } from "@/components/streams/stream-table";
-import {prisma} from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { StreamFormDialog } from "@/components/streams/stream-form";
 
 export default async function StreamsPage() {
   const streams = await prisma.stream.findMany();
-  
-  // Convert Date objects to strings
   const streamsWithStringDates = streams.map(stream => ({
     ...stream,
     createdAt: stream.createdAt.toISOString(),
@@ -22,7 +20,7 @@ export default async function StreamsPage() {
               <h1 className="text-2xl font-bold tracking-tight">Streams</h1>
               <p className="text-muted-foreground">Manage your Streams</p>
             </div>
-              <StreamFormDialog />
+            <StreamFormDialog />
           </div>
           <StreamTable columns={streamColumns} data={streamsWithStringDates} />
         </div>
@@ -30,3 +28,4 @@ export default async function StreamsPage() {
     </div>
   );
 }
+

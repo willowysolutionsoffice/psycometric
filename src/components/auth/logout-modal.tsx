@@ -1,41 +1,75 @@
-import { Button } from '@/components/ui/button'
+"use client";
+
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+// import { toast } from "sonner";
+// import { useRouter } from "next/navigation";
 
-interface LogoutModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-}
+export const LogoutDialog = ({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}) => {
+    const router = useRouter()
 
-export function LogoutModal({ open, onOpenChange, onConfirm }: LogoutModalProps) {
+const handleLogout = async () => {
+  try {
+    const res = await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.error(data?.error || "Logout failed");
+      return;
+    }
+
+    toast.success(data?.message || "Logged out successfully");
+    router.replace("/admin/login");
+  } catch (error) {
+    console.error("Logout error:", error);
+    toast.error("Failed to logout");
+  }
+};
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Sign out</DialogTitle>
-          <DialogDescription>
-            Are you sure you want to sign out? You will need to sign in again to access your account.
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={onConfirm}>
-            Sign out
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-// Export alias for compatibility
-export const LogoutDialog = LogoutModal
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+          <AlertDialogDescription>
+            You will be redirected to the login page.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
