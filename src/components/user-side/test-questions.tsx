@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, User} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Question } from '@/types/question';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 // Shuffle array function using Fisher-Yates algorithm
 function shuffleArray<T>(array: T[]): T[] {
@@ -64,11 +66,11 @@ function transformQuestion(dbQuestion: Question): DisplayQuestion {
   };
 }
 
-interface AnswerResult {
-  questionId: string;
-  personalityType: string | null;
-  isCorrect: boolean;
-}
+// interface AnswerResult {
+//   questionId: string;
+//   personalityType: string | null;
+//   isCorrect: boolean;
+// }
 
 export default function TestQuestions() {
   const router = useRouter();
@@ -78,13 +80,16 @@ export default function TestQuestions() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [completedQuestions, setCompletedQuestions] = useState(0);
-  const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
+  // const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
  // Timer setup: start from 15 minutes (900 seconds)
   const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
   const [score, setScore] = useState(0);
   const [userId, setUserId] = useState<string | null>(null);
   const [correctByType, setCorrectByType] = useState<Record<string, number>>({});
   const [totalByType, setTotalByType] = useState<Record<string, number>>({});
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [showRestoreModal, setShowRestoreModal] = useState(false);
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
 
   // On mount, read user and prevent re-attempt if result exists
   useEffect(() => {
@@ -213,6 +218,75 @@ export default function TestQuestions() {
     fetchQuestions();
   }, []);
 
+  // Mark test as in-progress, and show restore modal if a previous session existed
+  useEffect(() => {
+    try {
+      const existed = typeof window !== 'undefined' ? sessionStorage.getItem('testInProgress') : null;
+      if (existed) {
+        setShowRestoreModal(true);
+      }
+      sessionStorage.setItem('testInProgress', 'true');
+    } catch {}
+  }, []);
+
+  // Intercept page reload/close with native confirm dialog
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, []);
+
+  // Prevent back navigation and show modal
+  useEffect(() => {
+    // Push a state so that back triggers popstate we can neutralize
+    const push = () => {
+      try { history.pushState(null, '', location.href); } catch {}
+    };
+    push();
+    const onPopState = () => {
+      // Neutralize back and show modal
+      push();
+      setPendingHref(null);
+      setShowLeaveModal(true);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  // Intercept same-tab anchor navigations to show modal
+  useEffect(() => {
+    const clickHandler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const anchor = target.closest('a') as HTMLAnchorElement | null;
+      if (!anchor) return;
+      // Ignore new tabs, downloads, external, modifiers
+      if (anchor.target === '_blank' || anchor.download) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const href = anchor.getAttribute('href') || '';
+      if (!href || href.startsWith('#')) return;
+      // Prevent default and show modal
+      e.preventDefault();
+      setPendingHref(href);
+      setShowLeaveModal(true);
+    };
+    document.addEventListener('click', clickHandler, true);
+    return () => document.removeEventListener('click', clickHandler, true);
+  }, []);
+
+  const confirmLeave = () => {
+    try { sessionStorage.removeItem('testInProgress'); } catch {}
+    window.location.reload(); // Reset the test fully.
+  };
+
+  const cancelLeave = () => {
+    setPendingHref(null);
+    setShowLeaveModal(false);
+  };
+
 // Countdown effect
 useEffect(() => {
     if (timer <= 0 || loading || questions.length === 0) return; // stop when timer reaches 0 or no questions
@@ -255,7 +329,7 @@ const formatTime = (seconds: number) => {
       const uid = userId;
       if (uid) {
         try {
-          const res = await fetch('/api/results', {
+          await fetch('/api/results', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -307,6 +381,40 @@ const formatTime = (seconds: number) => {
 
   return (
     <div className="min-h-screen bg-orange-50">
+      {/* Leave/Restart Modal (on back/navigate away) */}
+      <Dialog open={showLeaveModal} onOpenChange={setShowLeaveModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Leave test?</DialogTitle>
+            <DialogDescription>
+              Your current test progress will not be saved. The test will restart from the first question.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-end">
+            <Button variant="outline" onClick={cancelLeave}>Stay</Button>
+            <Button variant="destructive" onClick={confirmLeave}>Restart Test</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Restore Modal (on reload/new mount after an in-progress session) */}
+      <Dialog open={showRestoreModal} onOpenChange={setShowRestoreModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Test restarted</DialogTitle>
+            <DialogDescription>
+              A previous test session was detected. Progress wasn&apos;t saved. You will start again from question 1.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-end">
+            <Button
+              onClick={() => {
+                setShowRestoreModal(false);
+              }}
+            >OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Top Header Bar */}
       <div className="bg-orange-50 px-4 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-end">
