@@ -23,6 +23,10 @@ interface DisplayQuestion {
   correctAnswer: string;
   explanation?: string;
   personalityType?: string | null;
+<<<<<<< HEAD
+=======
+  originalQuestion: Question; // Keep reference to original question
+>>>>>>> 504ab6c760b866cfcfd6777ff4d75a90393bf720
 }
 
 function transformQuestion(dbQuestion: Question): DisplayQuestion {
@@ -60,8 +64,19 @@ function transformQuestion(dbQuestion: Question): DisplayQuestion {
     question: dbQuestion.question,
     options: shuffledOptions,
     correctAnswer: newCorrectAnswer,
+<<<<<<< HEAD
     personalityType: dbQuestion.personalityType ?? null,
+=======
+    personalityType: dbQuestion.personalityType,
+    originalQuestion: dbQuestion,
+>>>>>>> 504ab6c760b866cfcfd6777ff4d75a90393bf720
   };
+}
+
+interface AnswerResult {
+  questionId: string;
+  personalityType: string | null;
+  isCorrect: boolean;
 }
 
 export default function TestQuestions() {
@@ -72,6 +87,7 @@ export default function TestQuestions() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [completedQuestions, setCompletedQuestions] = useState(0);
+  const [answerResults, setAnswerResults] = useState<AnswerResult[]>([]);
  // Timer setup: start from 15 minutes (900 seconds)
   const [timer, setTimer] = useState(900); // ✅ 15 * 60 = 900 seconds
   const [score, setScore] = useState(0);
@@ -232,6 +248,7 @@ const formatTime = (seconds: number) => {
   const handleSubmit = () => {
     setIsSubmitted(true);
     setCompletedQuestions(completedQuestions + 1);
+<<<<<<< HEAD
     if (selectedAnswer && selectedAnswer === questions[currentQuestion].correctAnswer) {
       setScore(prev => prev + 1);
       const t = (questions[currentQuestion].personalityType || '').trim();
@@ -260,6 +277,43 @@ const formatTime = (seconds: number) => {
           // If already exists (409), proceed anyway
         } catch {}
       }
+=======
+    
+    // Track the answer result
+    const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
+    const result: AnswerResult = {
+      questionId: questions[currentQuestion].id,
+      personalityType: questions[currentQuestion].personalityType || null,
+      isCorrect: isCorrect,
+    };
+    
+    setAnswerResults(prev => [...prev, result]);
+  };
+
+  const handleNext = () => {
+    // If this is the last question (question 20), save results and redirect to interest result page
+    if (currentQuestion >= 19) {
+      // Ensure the last answer is tracked (in case handleSubmit was called)
+      const isCorrect = selectedAnswer === questions[currentQuestion].correctAnswer;
+      const finalResults = [...answerResults];
+      
+      // Check if current question result is already tracked
+      const alreadyTracked = finalResults.some(r => r.questionId === questions[currentQuestion].id);
+      if (!alreadyTracked) {
+        finalResults.push({
+          questionId: questions[currentQuestion].id,
+          personalityType: questions[currentQuestion].personalityType || null,
+          isCorrect: isCorrect,
+        });
+      }
+      
+      // Save results to localStorage
+      const finalResult = {
+        answers: finalResults,
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem('testResults', JSON.stringify(finalResult));
+>>>>>>> 504ab6c760b866cfcfd6777ff4d75a90393bf720
       router.push('/interest-result');
       return;
     }
@@ -302,18 +356,18 @@ const formatTime = (seconds: number) => {
     <div className="min-h-screen bg-orange-50">
       {/* Top Header Bar */}
       <div className="bg-orange-50 px-4 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          {/* Title */}
-          <h2 className="text-lg md:text-xl font-semibold text-orange-600">
-            Aerospace Engineering
-          </h2>
+        <div className="max-w-5xl mx-auto flex items-center justify-end">
 
           {/* Right side icons */}
+<<<<<<< HEAD
           <div className="flex items-center gap-4">
             {/* Dynamic Score */}
             <div className="text-orange-600 font-semibold">
               Score: {score}
             </div>
+=======
+          <div className="flex items-center gap-4 ">
+>>>>>>> 504ab6c760b866cfcfd6777ff4d75a90393bf720
 
             {/* Progress Circle */}
             <div className="relative w-14 h-14">
