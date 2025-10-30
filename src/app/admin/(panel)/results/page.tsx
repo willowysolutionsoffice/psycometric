@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import { ResultsTable } from '@/components/admin/results-table'
+import { ResultsTable } from '@/components/results/results-table'
+import { resultColumns } from '@/components/results/result-columns'
 
 export default async function AdminResultsPage() {
   const results = await prisma.result.findMany({
@@ -24,7 +25,7 @@ export default async function AdminResultsPage() {
               <p className="text-muted-foreground">Manage student results</p>
             </div>
           </div>
-          <ResultsTable data={rows} />
+          <ResultsTable columns={resultColumns} data={rows} />
         </div>
       </div>
     </div>

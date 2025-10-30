@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import UserLogoutModal from "@/components/auth/user-logout-modal";
 
 export default function Header() {
   const [userName] = useState<string>(() => {
@@ -23,15 +24,10 @@ export default function Header() {
     }
   });
   const router = useRouter();
-
-  const handleLogout = () => {
-    try {
-      localStorage.removeItem('authUser');
-    } catch {}
-    router.push('/login');
-  };
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   return (
+    <>
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -69,7 +65,7 @@ export default function Header() {
                   <Key className="w-4 h-4 text-gray-600" />
                   <span className="text-sm font-medium">Update Password</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3" onClick={handleLogout}>
+                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3" onClick={() => setLogoutOpen(true)}>
                   <LogOut className="w-4 h-4 text-gray-600" />
                   <span className="text-sm font-medium">Logout</span>
                 </DropdownMenuItem>
@@ -79,5 +75,7 @@ export default function Header() {
         </div>
       </div>
     </header>
+    <UserLogoutModal open={logoutOpen} setOpen={setLogoutOpen} />
+    </>
   );
 }

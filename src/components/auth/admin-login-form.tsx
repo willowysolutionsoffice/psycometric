@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { IconLogout } from "@tabler/icons-react";
 import { Loader2 } from "lucide-react";
 
 export default function AdminLoginPage({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -27,26 +26,21 @@ export default function AdminLoginPage({ className, ...props }: HTMLAttributes<H
     setErrorMessage("");
     setIsExecuting(true);
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-
-      const data = await res.json();
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
         setErrorMessage(data?.error || "Invalid email or password");
         return;
       }
-
-      const userRole = (data?.user?.role || "").toString().toLowerCase();
-      if (userRole !== "admin") {
-        setErrorMessage("Only admin can login here.");
-        return;
-      }
-
+      try {
+        localStorage.setItem('authUser', JSON.stringify({ email: values.email, role: 'admin', name: 'Administrator' }));
+      } catch {}
       router.push("/admin/dashboard");
-    } catch (e) {
+    } catch {
       setErrorMessage("Login failed. Please try again.");
     } finally {
       setIsExecuting(false);
@@ -98,7 +92,9 @@ export default function AdminLoginPage({ className, ...props }: HTMLAttributes<H
                     </FormItem>
                   )}
                 />
-                {/* error message handled via errorMessage state if needed */}
+                {errorMessage && (
+                  <div className="text-sm text-red-600">{errorMessage}</div>
+                )}
                 <Button type="submit" className="w-full" disabled={isExecuting}>
                   {isExecuting ? <Loader2 className="animate-spin size-4" /> : "Login"}
                 </Button>

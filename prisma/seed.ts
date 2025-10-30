@@ -63,7 +63,7 @@ async function main() {
   const adminPasswordPlain = 'admin123';
   const adminHashed = await bcrypt.hash(adminPasswordPlain, 10);
 
-  await prisma.user.upsert({
+  const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
       role: 'admin',
@@ -78,6 +78,28 @@ async function main() {
       emailVerified: true,
     },
   });
+
+  // Ensure Better Auth credential account exists for email/password login
+  async function ensureAccount(providerId: string) {
+    const existing = await prisma.account.findFirst({
+      where: { accountId: adminEmail.toLowerCase(), providerId, userId: adminUser.id },
+    });
+    if (!existing) {
+      await prisma.account.create({
+        data: {
+          id: crypto.randomUUID(),
+          accountId: adminEmail.toLowerCase(),
+          providerId,
+          userId: adminUser.id,
+          password: adminHashed,
+        },
+      });
+    }
+  }
+
+  // Common provider ids used by email/password strategies
+  await ensureAccount('email');
+  await ensureAccount('email-password');
 
   // Questions are seeded elsewhere; only ensuring admin user exists here.
   console.log('✅ Ensured admin user exists');

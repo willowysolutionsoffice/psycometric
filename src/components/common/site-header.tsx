@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LogoutDialog } from "@/components/auth/logout-modal";
+// import { LogoutDialog } from "@/components/auth/logout-modal";
 
 const { defaultTitle } = APP_CONFIG.siteHeader;
 
@@ -22,6 +22,17 @@ interface SiteHeaderProps {
 export function SiteHeader({ title = defaultTitle }: SiteHeaderProps = {}) {
   const router = useRouter();
   const [logoutOpen, setLogoutOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+      try { localStorage.removeItem('authUser'); } catch {}
+    } finally {
+      setLogoutOpen(false);
+      router.push('/admin/login');
+    }
+  };
 
   return (
     <>
@@ -48,7 +59,7 @@ export function SiteHeader({ title = defaultTitle }: SiteHeaderProps = {}) {
                 <Key className="w-4 h-4 text-gray-600" />
                 <span className="text-sm font-medium">Update Password</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-3 px-3 py-2" onClick={() => setLogoutOpen(true)}>
+              <DropdownMenuItem className="flex items-center gap-3 px-3 py-2" onClick={handleLogout}>
                 <LogOut className="w-4 h-4 text-gray-600" />
                 <span className="text-sm font-medium">Logout</span>
               </DropdownMenuItem>
@@ -58,8 +69,7 @@ export function SiteHeader({ title = defaultTitle }: SiteHeaderProps = {}) {
       </div>
     </header>
     
-    {/* Logout Confirmation Modal */}
-    <LogoutDialog open={logoutOpen} setOpen={setLogoutOpen} />
+    {/* Logout modal intentionally not used; performing instant logout */}
     </>
   );
 }
