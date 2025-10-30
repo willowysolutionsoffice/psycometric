@@ -1,6 +1,9 @@
+"use client"
 import Image from 'next/image';
 import { ChevronDown, User, Key, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +12,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function Header() {
+  const [userName, setUserName] = useState<string>('');
+  const router = useRouter();
+
+  useEffect(() => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
+      if (!raw) return;
+      const user = JSON.parse(raw) as { name?: string };
+      if (user?.name) setUserName(user.name);
+    } catch {}
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('authUser');
+    } catch {}
+    router.push('/login');
+  };
+
   return (
     <header className="bg-white border-b border-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,7 +51,7 @@ export default function Header() {
           {/* Right side - Welcome message and profile */}
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-700">
-              Welcome. <span className="font-medium">Jon Doe</span>
+              Welcome. <span className="font-medium">{userName || 'User'}</span>
             </span>
             
             {/* Profile dropdown */}
@@ -47,7 +69,7 @@ export default function Header() {
                   <Key className="w-4 h-4 text-gray-600" />
                   <span className="text-sm font-medium">Update Password</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3">
+                <DropdownMenuItem className="flex items-center gap-3 px-4 py-3" onClick={handleLogout}>
                   <LogOut className="w-4 h-4 text-gray-600" />
                   <span className="text-sm font-medium">Logout</span>
                 </DropdownMenuItem>

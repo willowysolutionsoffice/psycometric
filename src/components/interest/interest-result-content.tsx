@@ -65,77 +65,52 @@ export default function InterestResultContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get test results from localStorage
-    const testResultsJson = localStorage.getItem('testResults');
-    
-    if (!testResultsJson) {
-      // No results found, redirect to test page
-      router.push('/test-questions');
-      return;
-    }
-
     try {
-      const testResults: TestResults = JSON.parse(testResultsJson);
-      
-      // Calculate scores per personality type
-      const personalityTypes = [
-        'Realistic',
-        'Investigative',
-        'Artistic',
-        'Social',
-        'Enterprising',
-        'Conventional'
-      ];
+      const raw = typeof window !== 'undefined' ? localStorage.getItem('authUser') : null;
+      if (!raw) {
+        router.push('/login');
+        return;
+      }
+      const user = JSON.parse(raw) as { id?: string };
+      if (!user?.id) {
+        router.push('/login');
+        return;
+      }
 
-      const personalityStats = personalityTypes.map(type => {
-        // Filter answers for this personality type
-        const typeAnswers = testResults.answers.filter(
-          answer => answer.personalityType === type
-        );
-        
-        // Count correct answers
-        const correctCount = typeAnswers.filter(answer => answer.isCorrect).length;
-        const totalCount = typeAnswers.length;
-        
-        // Calculate score (0-10 scale based on percentage)
-        // If no questions for this type, score is 0
-        const percentage = totalCount > 0 ? (correctCount / totalCount) * 100 : 0;
-        const score = Math.round((percentage / 100) * 10); // Scale to 0-10
-        
-        // Determine level
-        let level: 'Low' | 'Moderate' | 'High';
-        if (score >= 8) {
-          level = 'High';
-        } else if (score >= 4) {
-          level = 'Moderate';
-        } else {
-          level = 'Low';
-        }
-
-        return {
-          name: type,
-          score: score,
-          level: level,
-        };
-      });
-
-      // Create InterestType objects for InterestsMean component
-      const interestTypesData: InterestType[] = personalityStats.map(stat => ({
-        name: stat.name,
-        role: personalityDescriptions[stat.name]?.role || '',
-        score: stat.score,
-        level: stat.level,
-        description: personalityDescriptions[stat.name]?.description || '',
-      }));
-
-      // Batch state updates
-      requestAnimationFrame(() => {
-        setScores(personalityStats);
-        setInterestTypes(interestTypesData);
-        setLoading(false);
-      });
-    } catch (error) {
-      console.error('Error parsing test results:', error);
+      fetch(`/api/results?userId=${user.id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data?.result) {
+            router.push('/test-questions');
+            return;
+          }
+          const details = data.result.details as { byType?: Record<string, number>, totals?: Record<string, number> } | undefined;
+          if (details?.byType && details?.totals) {
+            const personalityStats: InterestScore[] = Object.keys(details.totals).map(type => {
+              const correct = details.byType?.[type] ?? 0;
+              const total = details.totals?.[type] ?? 0;
+              const score = total > 0 ? Math.round((correct / total) * 10) : 0;
+              let level: 'Low' | 'Moderate' | 'High' = 'Low';
+              if (score >= 8) level = 'High';
+              else if (score >= 4) level = 'Moderate';
+              return { name: type, score, level };
+            });
+            const interestTypesData: InterestType[] = personalityStats.map(stat => ({
+              name: stat.name,
+              role: personalityDescriptions[stat.name]?.role || '',
+              score: stat.score,
+              level: stat.level,
+              description: personalityDescriptions[stat.name]?.description || '',
+            }));
+            setScores(personalityStats);
+            setInterestTypes(interestTypesData);
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          router.push('/test-questions');
+        });
+    } catch {
       router.push('/test-questions');
     }
   }, [router]);
