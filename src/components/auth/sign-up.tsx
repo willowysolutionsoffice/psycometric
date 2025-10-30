@@ -92,15 +92,15 @@ const SignUpPage = () => {
   // Carousel images data
   const carouselImages = [
     {
-      src: "/images/carousel/brain2.jpg",
+      src: "/images/carousel/st3.jpg",
       alt: "Join Psychometrics",
     },
     {
-      src: "/images/carousel/psyco1.jpg",
+      src: "/images/carousel/st1.jpg",
       alt: "Professional Tools",
     },
     {
-      src: "/images/carousel/brain2.jpg",
+      src: "/images/carousel/st2.jpg",
       alt: "Secure Platform",
     }
   ];

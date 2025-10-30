@@ -63,15 +63,15 @@ const LoginPage = () => {
   // Carousel images data
   const carouselImages = [
     {
-      src: "/images/carousel/psyco1.jpg",
+      src: "/images/carousel/st3.jpg",
       alt: "Psychometric Assessment",
     },
     {
-      src: "/images/carousel/brain2.jpg",
+      src: "/images/carousel/st1.jpg",
       alt: "Assessment Tools", 
     },
     {
-      src: "/images/carousel/psyco1.jpg",
+      src: "/images/carousel/st2.jpg",
       alt: "Data Analytics",
     }
   ];
