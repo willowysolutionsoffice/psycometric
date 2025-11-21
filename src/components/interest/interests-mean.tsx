@@ -265,6 +265,13 @@ const relatedTypeContent: Record<string, { code: string; majors: string[]; pathw
 
 export function InterestsMean({ interestTypes }: InterestsMeanProps) {
   const router = useRouter();
+  const handleBookCounselorDemo = () => {
+    if (typeof window !== 'undefined') {
+      window.alert("Counselor booking coming soon! We'll help match you with a coach to build a personalized career plan.");
+    } else {
+      console.log("Counselor booking coming soon!");
+    }
+  };
 
   // Hardcoded data matching the image order and content (without Artistic)
   const defaultInterestTypes: InterestType[] = [
@@ -445,14 +452,26 @@ export function InterestsMean({ interestTypes }: InterestsMeanProps) {
         </div>
       </CardContent>
       
-      {/* Dashboard Button */}
-      <div className="flex justify-end p-4">
-        <Button
-          onClick={() => router.push('/')}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-2 rounded-lg shadow-md transition-colors duration-200"
-        >
-          Home
-        </Button>
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-4 p-5 border-t border-teal-100 bg-teal-50/40 rounded-b-lg sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-gray-700 sm:max-w-xl">
+          Ready to take the next step? Book a counselor session to translate your strongest interest types into a focused study plan and confident career direction.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto border-orange-300 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+            onClick={handleBookCounselorDemo}
+          >
+            Book Counselor
+          </Button>
+          <Button
+            onClick={() => router.push('/')}
+            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-2 rounded-lg shadow-md transition-colors duration-200"
+          >
+            Home
+          </Button>
+        </div>
       </div>
     </Card>
   );
