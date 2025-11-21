@@ -266,11 +266,7 @@ const relatedTypeContent: Record<string, { code: string; majors: string[]; pathw
 export function InterestsMean({ interestTypes }: InterestsMeanProps) {
   const router = useRouter();
   const handleBookCounselorDemo = () => {
-    if (typeof window !== 'undefined') {
-      window.alert("Counselor booking coming soon! We'll help match you with a coach to build a personalized career plan.");
-    } else {
-      console.log("Counselor booking coming soon!");
-    }
+    router.push('/book-counselor');
   };
 
   // Hardcoded data matching the image order and content (without Artistic)
