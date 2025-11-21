@@ -11,11 +11,6 @@ interface AnswerResult {
   isCorrect: boolean;
 }
 
-interface TestResults {
-  answers: AnswerResult[];
-  timestamp: string;
-}
-
 interface InterestScore {
   name: string;
   score: number;
@@ -30,31 +25,30 @@ interface InterestType {
   description: string;
 }
 
-// Personality type descriptions
 const personalityDescriptions: Record<string, { role: string; description: string }> = {
   'Realistic': {
     role: 'Do-er',
-    description: 'Your realistic trait shows you like to work with your hands, see the physical world, and engage in physical activities. You are adventurous, and often like to explore and experiment outdoors. You also prefer to work a problem through by doing something, rather than talking about it, or sitting and thinking about it. You are also drawn to concrete approaches to problem-solving.'
+    description: 'These people are often good at mechanical or athletic jobs. You enjoy working with your hands, focusing on tangible tasks, and seeing direct results from your work.'
   },
   'Investigative': {
     role: 'Thinker',
-    description: 'Your Investigative trait shows you are interested in areas that require research. You like to see how things work, analyze what you find, and solve problems. You are curious, self-motivated, and always looking for answers to the questions "How" and "Why".'
+    description: 'These people like to watch, learn, analyze, and solve problems. You are curious, self-motivated, and always searching for answers to “How” and “Why”.'
   },
   'Artistic': {
     role: 'Creator',
-    description: 'Your artistic trait shows you like generating new ideas for most things. You don\'t like to follow a specific trend. You love having your freedom to express. You like variety and unstructured situations where you can freely use your creative skills.'
+    description: 'These people like to work in unstructured situations where they can use their creativity, explore ideas, and express themselves freely.'
   },
   'Social': {
     role: 'Helper',
-    description: 'Your social trait indicates you enjoy working with people, helping them, and teaching them. You are cooperative, friendly, and understanding. You thrive in environments where you can interact and contribute to the well-being of others.'
+    description: 'These people like to work with other people rather than things. You enjoy helping, teaching, and collaborating to support others.'
   },
   'Enterprising': {
     role: 'Persuader',
-    description: 'Your enterprising trait shows that you like to work with others. You often like to lead the way to ensure that the job gets done. You usually work with a high degree of energy, and are always working towards finding solutions to the problem.'
+    description: 'These people enjoy persuading and performing with others. You like to take the lead, influence decisions, and drive ideas forward.'
   },
   'Conventional': {
     role: 'Organizer',
-    description: 'Your conventional trait suggests you prefer structured tasks, working with data, and following clear procedures. You are organized, efficient, and detail-oriented. You excel in roles that require precision and adherence to rules.'
+    description: 'These people are detail-oriented and like to work with data and systems. You excel in structured settings that require organization, accuracy, and clear procedures.'
   }
 };
 
@@ -131,8 +125,6 @@ export default function InterestResultContent() {
       <div className="container mx-auto px-6 space-y-12">
         {/* Interest Result Component */}
         <InterestResult scores={scores} />
-        
-        {/* Interests Mean Component */}
         <InterestsMean interestTypes={interestTypes} />
       </div>
     </div>
