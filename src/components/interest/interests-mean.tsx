@@ -156,7 +156,7 @@
 // }
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -314,8 +314,21 @@ export function InterestsMean({ interestTypes }: InterestsMeanProps) {
     return withoutArtistic.length > 0 ? withoutArtistic : defaultInterestTypes;
   }, [interestTypes]);
 
+  const highestScoreTypes = useMemo(() => {
+    if (!filteredTypes.length) return [];
+    const topScore = Math.max(...filteredTypes.map((type) => type.score ?? 0));
+    return filteredTypes.filter((type) => (type.score ?? 0) === topScore);
+  }, [filteredTypes]);
+
   const [activeTab, setActiveTab] = useState(0);
-  const activeType = filteredTypes[Math.min(activeTab, filteredTypes.length - 1)] ?? filteredTypes[0];
+
+  useEffect(() => {
+    setActiveTab(0);
+  }, [highestScoreTypes]);
+
+  const displayTypes = highestScoreTypes.length > 0 ? highestScoreTypes : filteredTypes;
+  const activeType =
+    displayTypes[Math.min(activeTab, Math.max(displayTypes.length - 1, 0))] ?? displayTypes[0];
   const related = activeType ? relatedTypeContent[activeType.name as keyof typeof relatedTypeContent] : undefined;
 
   const getScoreColor = (level: string) => {
@@ -368,7 +381,7 @@ export function InterestsMean({ interestTypes }: InterestsMeanProps) {
       <CardContent className="p-0">
         {/* Tabs */}
         <div className="flex flex-wrap border-b border-teal-200">
-          {filteredTypes.map((type, index) => (
+          {displayTypes.map((type, index) => (
             <Button
               key={type.name}
               variant="ghost"
@@ -376,11 +389,9 @@ export function InterestsMean({ interestTypes }: InterestsMeanProps) {
                 activeTab === index
                   ? `${getTabColor(type.level)} rounded-t-lg`
                   : `bg-white ${getInactiveTabColor(type.level)} border-b-2 hover:bg-gray-50`
-              } ${
-                index === 0 ? 'rounded-tl-lg' : ''
-              } ${
-                index === filteredTypes.length - 1 ? 'rounded-tr-lg' : ''
-              }`}
+              } ${index === 0 ? 'rounded-tl-lg' : ''} ${
+                index === displayTypes.length - 1 ? 'rounded-tr-lg' : ''
+              } ${displayTypes.length === 1 ? 'pointer-events-none cursor-default' : ''}`}
               onClick={() => setActiveTab(index)}
             >
               <span className="truncate">
