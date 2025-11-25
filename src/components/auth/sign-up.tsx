@@ -34,11 +34,15 @@ const SignUpPage = () => {
       fullName: "",
       email: "",
       phoneNumber: "",
+      class: "",
       stream: "",
       password: "",
       confirmPassword: "",
     },
   });
+
+  const selectedClass = form.watch("class");
+  const showStream = selectedClass === "Plus One" || selectedClass === "Plus Two";
 
   const isSubmitting = form.formState.isSubmitting;
 
@@ -70,13 +74,26 @@ const SignUpPage = () => {
           name: values.fullName,
           email: values.email,
           phoneNumber: values.phoneNumber,
-          stream: values.stream,
+          class: values.class,
+          stream: values.stream || undefined,
           password: values.password,
         }),
       });
       if (response.ok) {
+        const created = await response.json().catch(() => ({} as unknown));
+        try {
+          // Persist minimal user info so the app treats them as logged-in client
+          // Fallback to submitted values when API returns a different shape
+          const stored = {
+            id: (created?.user?.id ?? created?.id) || undefined,
+            name: (created?.user?.name ?? created?.name) || values.fullName,
+            email: (created?.user?.email ?? created?.email) || values.email,
+            role: (created?.user?.role ?? created?.role) || 'student',
+          };
+          localStorage.setItem('authUser', JSON.stringify(stored));
+        } catch {}
         toast.success('Account created successfully!');
-        router.push('/login');
+        router.push('/');
       } else {
         const errorData = await response.json();
         setFormError(errorData.error || 'Failed to create account. Please try again.');
@@ -233,33 +250,69 @@ const SignUpPage = () => {
                 )}
               />
 
+              {/* Class */}
               <FormField
                 control={form.control}
-                name="stream"
+                name="class"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Stream</FormLabel>
+                    <FormLabel>Class</FormLabel>
                     <FormControl>
-                      <div className="relative">
-                        <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-subtle w-4 h-4 z-10" />
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <SelectTrigger className="w-full pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm">
-                            <SelectValue placeholder="Select your stream" />
-                          </SelectTrigger>
-                              <SelectContent>
-                                {streams.map((stream: { id: string; name: string }) => (
-                                  <SelectItem key={stream.id} value={stream.name}>
-                                    {stream.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                        </Select>
-                      </div>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger className="w-full py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                          <SelectValue placeholder="Select your class" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="2">2</SelectItem>
+                          <SelectItem value="3">3</SelectItem>
+                          <SelectItem value="4">4</SelectItem>
+                          <SelectItem value="5">5</SelectItem>
+                          <SelectItem value="6">6</SelectItem>
+                          <SelectItem value="7">7</SelectItem>
+                          <SelectItem value="8">8</SelectItem>
+                          <SelectItem value="9">9</SelectItem>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="Plus One">Plus One</SelectItem>
+                          <SelectItem value="Plus Two">Plus Two</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Stream - Only show if class is Plus One or Plus Two */}
+              {showStream && (
+                <FormField
+                  control={form.control}
+                  name="stream"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Stream</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <GraduationCap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-subtle w-4 h-4 z-10" />
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <SelectTrigger className="w-full pl-10 py-2 bg-input-bg border-social-border rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                              <SelectValue placeholder="Select your stream" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {streams.map((stream: { id: string; name: string }) => (
+                                <SelectItem key={stream.id} value={stream.name}>
+                                  {stream.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {/* Password */}
               <FormField

@@ -32,6 +32,7 @@ model User {
   name          String
   email         String
   phoneNumber   String?
+  class         String?
   stream        String?
   password      String
   emailVerified Boolean   @default(false)
