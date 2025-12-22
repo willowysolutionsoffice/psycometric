@@ -144,7 +144,7 @@ export default function BookCounselorPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white py-12">
+    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white py-12">
       <div className="container mx-auto px-6 space-y-10">
         <div className="rounded-3xl bg-white border border-teal-100 p-8 shadow-sm space-y-4">
           <div className="flex items-center gap-3 text-teal-600">
