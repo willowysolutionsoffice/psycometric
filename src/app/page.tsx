@@ -1,4 +1,3 @@
-import React from 'react'
 import PsychometricDashboard from '@/components/user-dashboard/dashboard'
 
 const HomePage = () => {
