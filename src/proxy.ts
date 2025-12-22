@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Get session token from Better Auth cookies
@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   //   }
   // }
     // Note: Role checking should be done in the admin layout component
-    // since middleware doesn't have access to user data from database
+    // since proxy doesn't have access to user data from database
   
   // Protect user dashboard routes - require authentication
   if (pathname.startsWith("/dashboard")) {
@@ -54,3 +54,4 @@ export const config = {
     "/admin/:path*"
   ],
 };
+
