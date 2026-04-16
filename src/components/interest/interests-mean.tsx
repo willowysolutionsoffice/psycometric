@@ -323,6 +323,7 @@ export function InterestsMean({ interestTypes }: InterestsMeanProps) {
   const [activeTab, setActiveTab] = useState(0);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveTab(0);
   }, [highestScoreTypes]);
 
