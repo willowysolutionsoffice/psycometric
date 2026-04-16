@@ -21,10 +21,10 @@ export default function PsychometricDashboard() {
             fetch(`/api/results?userId=${user.id}`)
               .then(res => res.json())
               .then(data => setHasAttempted(Boolean(data?.exists)))
-              .catch(() => {});
+              .catch(() => { });
           }
         }
-      } catch {}
+      } catch { }
     };
 
     checkLoginStatus();
@@ -41,7 +41,7 @@ export default function PsychometricDashboard() {
       }
       // Logged in, redirect based on whether they've attempted the test
       if (!hasAttempted) {
-        try { sessionStorage.removeItem('testInProgress'); } catch {} // << clear on fresh test
+        try { sessionStorage.removeItem('testInProgress'); } catch { } // << clear on fresh test
       }
       router.push(hasAttempted ? '/interest-result' : '/test-questions');
     } catch {
@@ -59,9 +59,9 @@ export default function PsychometricDashboard() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             {/* Left Side - Brain Illustration Image */}
             <div className="relative flex items-center justify-center">
-              <div className="relative w-full max-w-md aspect-square">
+              <div className="relative w-full max-w-lg aspect-square">
                 <Image
-                  src="/images/dashboard-img.png"
+                  src="/images/dashboard.png"
                   alt="Psychometric Assessment Brain Diagram"
                   fill
                   className="object-contain"
@@ -69,24 +69,24 @@ export default function PsychometricDashboard() {
                 />
               </div>
             </div>
-            
+
             {/* Right Side - Text Content */}
             <div className="text-white space-y-6">
               <h1 className="text-3xl md:text-4xl font-bold">
-                Psychometric Assessment
+                STUDENZO-DMIT
               </h1>
-              
-              <p className="text-lg leading-relaxed opacity-95">
-                Discover yourself and find out who you are, how you are, and what you can be with our psychometric assessments!
+
+              <p className="text-lg leading-relaxed opacity-95 text-red-100 font-semibold italic">
+                A Sure Way to Discover Your Inborn Talents & Personality
               </p>
-              
+
               <p className="text-base leading-relaxed opacity-90">
-                Our Psychometric and Career Assessment is based on globally reliable and validated career test theories on Interest, Aptitude, Personality, and Multiple Intelligences. These assessments are further fine-tuned to meet the global standards by a panel of career counsellors, psychologists, and research team (aka the really smart people). So relax and trust us with your future.
+                STUDENZO-DMIT is a scientifically validated assessment based on Genetics, Neuroscience, and Pediatric Psychology. By analyzing skin ridge patterns, this test provides an accurate map of an individual's inborn talents, learning habits, and multiple intelligences. Developed from legendary Cummins Methodology and Nobel-winning brain research, it helps mentors and parents understand innate characteristics for effective communication and all-round development. Let's work together to help every individual discover their true potential!
               </p>
             </div>
           </div>
         </div>
-        
+
         {/* Get Started / View Result Button */}
         <div className="flex justify-center mt-8">
           <button
